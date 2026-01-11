@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+<!-- This a the promotion page for the TL -> POJ converter, not part of the extension. -->
 
 <head>
     <meta charset="UTF-8">
@@ -7,7 +8,7 @@
     <title>TL -> POJ 隨時轉 | Tâi-lô to Pe̍h-ōe-jī Converter</title>
     <meta name="description"
         content="Instant Tâi-lô (TL) to POJ converter for web pages, typing, and files. Privacy-focused, runs 100% locally.">
-    <link rel="icon" type="image/png" href="../images/icon512.png">
+    <link rel="icon" type="image/png" href="images/icon512.png">
     <style>
         :root {
             /* Black Bear Color Palette */
@@ -414,7 +415,7 @@
 <body>
     <!-- Hero Section -->
     <section class="hero">
-        <img src="../images/icon512.png" alt="TL -> POJ Logo" class="logo">
+        <img src="images/icon512.png" alt="TL -> POJ Logo" class="logo">
         <h1></h1>
         <p class="subtitle"></p>
         <div class="cta-buttons">
@@ -467,11 +468,11 @@
     <section class="screenshots">
         <h2></h2>
         <div class="screenshot-gallery">
-            <img src="../images/screenshot-scan-selected.png" alt="Scan Mode - Selected Text">
-            <img src="../images/screenshot-fetch-article.png" alt="Fetch Article">
-            <img src="../images/screenshot-onsite-scan.png" alt="On-site Scan">
-            <img src="../images/screenshot-type-mode.png" alt="Type Mode">
-            <img src="../images/screenshot-file-mode.png" alt="File Mode">
+            <img src="images/screenshot-scan-selected.png" alt="Scan Mode - Selected Text">
+            <img src="images/screenshot-fetch-article.png" alt="Fetch Article">
+            <img src="images/screenshot-onsite-scan.png" alt="On-site Scan">
+            <img src="images/screenshot-type-mode.png" alt="Type Mode">
+            <img src="images/screenshot-file-mode.png" alt="File Mode">
         </div>
     </section>
 
@@ -479,9 +480,9 @@
     <section class="footer-links">
         <h2 id="docs-title"></h2>
         <div class="link-grid">
-            <a href="../docs/PRIVACY.md" id="link-privacy"></a>
-            <a href="../docs/LEGAL.md" id="link-legal"></a>
-            <a href="../docs/PERMISSIONS.md" id="link-permissions"></a>
+            <a href="docs/PRIVACY.md" id="link-privacy"></a>
+            <a href="docs/LEGAL.md" id="link-legal"></a>
+            <a href="docs/PERMISSIONS.md" id="link-permissions"></a>
         </div>
     </section>
 
@@ -509,7 +510,7 @@
                 ctaZip: '⬇️ 直接 táng-ló͘ .zip (Direct Download)',
                 chromeStoreUrl: 'https://chrome.google.com/webstore/detail/placeholder',
                 githubUrl: 'https://github.com/CyberOoHim/tl_poj_extension',
-                zipUrl: '../packed/extension_20260111_1700.zip'
+                zipUrl: 'packed/extension_20260111_1700.zip'
             },
 
             // Features Section
@@ -686,7 +687,7 @@
         // ========================================
         async function loadHelp(lang) {
             const container = document.getElementById('help-content');
-            const filename = lang === 'taigi' ? '../docs/HELP.md' : '../docs/HELP.en.md';
+            const filename = lang === 'taigi' ? 'docs/HELP.md' : 'docs/HELP.en.md';
 
             try {
                 const response = await fetch(filename);
