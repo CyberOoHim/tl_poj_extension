@@ -1,7 +1,7 @@
 # TL -> POJ Extension Packing Script
 # Creates a clean 'extension.zip' ready for Chrome Web Store upload
 
-$zipName = "extension.zip"
+$zipName = "packed/extension.zip"
 $tempDir = "dist_temp"
 
 # 1. Clean up previous build
@@ -42,7 +42,8 @@ Write-Host "Copying files..." -ForegroundColor Cyan
 foreach ($file in $files) {
     if (Test-Path $file) {
         Copy-Item $file -Destination $tempDir
-    } else {
+    }
+    else {
         Write-Warning "File not found: $file"
     }
 }
@@ -52,7 +53,8 @@ Write-Host "Copying folders..." -ForegroundColor Cyan
 foreach ($folder in $folders) {
     if (Test-Path $folder) {
         Copy-Item $folder -Destination $tempDir -Recurse
-    } else {
+    }
+    else {
         Write-Warning "Folder not found: $folder"
     }
 }
