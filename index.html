@@ -338,13 +338,70 @@
         }
 
         /* Responsive */
+        @media (max-width: 1024px) {
+            .hero {
+                min-height: auto;
+                padding: 6rem 2rem 3rem 2rem;
+            }
+        }
+
         @media (max-width: 768px) {
+            .hero {
+                min-height: auto;
+                padding: 4rem 1rem 2rem 1rem;
+            }
+
             .hero h1 {
-                font-size: 2rem;
+                font-size: 2.25rem;
+            }
+
+            .hero img.logo {
+                width: 100px;
+                height: 100px;
             }
 
             .hero .subtitle {
                 font-size: 1rem;
+            }
+
+            .features {
+                padding: 2rem 1rem;
+            }
+
+            .features h2 {
+                margin-bottom: 2rem;
+                font-size: 1.75rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .help-section {
+                padding: 2rem 1rem;
+            }
+
+            .help-section h2 {
+                margin-bottom: 1rem;
+                font-size: 1.75rem;
+            }
+
+            .screenshots {
+                padding: 2rem 1rem;
+            }
+
+            .screenshots h2 {
+                font-size: 1.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .footer-links {
+                padding: 2rem 1rem;
+            }
+
+            .logo-grid {
+                gap: 1.5rem;
             }
 
             .screenshot-gallery img {
@@ -454,7 +511,7 @@
 
             // Features Section
             features: {
-                title: '✨ Features / 功能',
+                title: '✨ Features / 機能',
                 items: [
                     {
                         icon: '🔍',
