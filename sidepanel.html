@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TL to POJ Converter</title>
+    <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            /* Side panel specific adjustments */
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            padding: 0.5rem;
+        }
+
+        .panel {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .panel.active {
+            display: flex;
+        }
+
+        /* Scan Mode specialized styles */
+        #scan-output-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* Prevent container from scrolling */
+        }
+
+        #scan-output-container .toolbar {
+            flex-shrink: 0;
+            /* Prevent toolbar from shrinking */
+        }
+
+        #scan-output {
+            flex: 1;
+            /* font-size handled by global styles/var */
+            line-height: 1.6;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            resize: none;
+            color: var(--text-primary);
+            overflow-y: auto;
+            /* Enable internal scrolling */
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        /* Toast notification styles */
+        .toast-container {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: toastIn 0.3s ease forwards;
+            pointer-events: auto;
+            border-left: 4px solid var(--accent-color, #4a90d9);
+        }
+
+        .toast.error {
+            border-left-color: #dc3545;
+        }
+
+        .toast.success {
+            border-left-color: #28a745;
+        }
+
+        @keyframes toastIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Markdown rendered links */
+        #scan-output-markdown a {
+            color: var(--accent-color, #4a90d9);
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        #scan-output-markdown a:hover {
+            text-decoration: underline;
+        }
+
+        #scan-output-markdown a.md-image-link {
+            display: inline-block;
+            padding: 2px 6px;
+            background: var(--bg-tertiary, rgba(0, 0, 0, 0.1));
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        #scan-output-markdown a.md-image-link:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Flex Header for Logo, Title, Toggle -->
+        <header class="app-header">
+            <div class="tabs">
+                <button class="tab-btn active" id="tab-scan"></button>
+                <button class="tab-btn" id="tab-type"></button>
+                <button class="tab-btn" id="tab-file"></button>
+                <button class="tab-btn" id="tab-help">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" width="36" height="12" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Gear Icon: Moved closer to center (Start x=28) -->
+                        <g transform="translate(28, 8)">
+                            <path
+                                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </g>
+
+                        <!-- Slash: Centered -->
+                        <line x1="55" y1="32" x2="65" y2="8" stroke-width="2.5" />
+
+                        <!-- Question Mark Icon: Moved closer to center (Start x=68) -->
+                        <g transform="translate(68, 8)">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                            <path d="M12 17h.01" />
+                        </g>
+                    </svg>
+                </button>
+            </div>
+            <div class="controls-wrapper" style="display: flex; gap: 0.5rem; align-items: center;">
+                <button id="btn-font-decrease" class="theme-btn" aria-label="Decrease Font Size"
+                    style="font-size: 0.7rem; padding: 2px 5px;">A-</button>
+                <button id="btn-font-increase" class="theme-btn" aria-label="Increase Font Size"
+                    style="font-size: 0.85rem; padding: 2px 5px;">A+</button>
+                <button id="theme-toggle" class="theme-btn" aria-label="Toggle Dark Mode">
+                    <!-- Sun Icon (Light Mode) -->
+                    <svg class="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <!-- Moon Icon (Dark Mode) -->
+                    <svg class="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5" style="display: none;">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Mode 1: SCAN (Reader) -->
+        <div id="panel-scan" class="panel active">
+            <div id="scan-output-container">
+                <div class="toolbar" style="margin-bottom: 0.5rem; justify-content: flex-end; gap: 1rem;">
+                    <label class="scan-status-label"></label>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div class="switch-container">
+                            <input type="checkbox" id="auto-convert-toggle" class="switch-input">
+                            <label for="auto-convert-toggle" class="switch-label">
+                                <span class="switch-slider"></span>
+                            </label>
+                            <label for="auto-convert-toggle" class="switch-text"
+                                style="font-size: var(--font-size-xxs); font-weight: var(--font-weight-medium); color: var(--color-text-secondary); margin: 0; cursor: pointer;"></label>
+                        </div>
+                        <div class="switch-container">
+                            <input type="checkbox" id="scan-enable-conversion" class="switch-input">
+                            <label for="scan-enable-conversion" class="switch-label">
+                                <span class="switch-slider"></span>
+                            </label>
+                            <label for="scan-enable-conversion" class="switch-text"
+                                style="font-size: var(--font-size-xxs); font-weight: var(--font-weight-medium); color: var(--color-text-secondary); margin: 0; cursor: pointer;"></label>
+                        </div>
+                        <div class="switch-container">
+                            <input type="checkbox" id="markdown-display-toggle" class="switch-input">
+                            <label for="markdown-display-toggle" class="switch-label">
+                                <span class="switch-slider"></span>
+                            </label>
+                            <label for="markdown-display-toggle" class="switch-text"
+                                style="font-size: var(--font-size-xxs); font-weight: var(--font-weight-medium); color: var(--color-text-secondary); margin: 0; cursor: pointer;"></label>
+                        </div>
+                        <button class="tool-btn" id="btn-copy-scan"></button>
+                        <button class="tool-btn" id="btn-download-scan"></button>
+                    </div>
+                </div>
+                <!-- Placeholder set via JS -->
+                <textarea id="scan-output" readonly></textarea>
+                <!-- Rendered Markdown display (hidden by default) -->
+                <div id="scan-output-markdown"
+                    style="display: none; flex: 1; overflow-y: auto; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); line-height: 1.6; font-size: var(--content-font-size, 1rem);">
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode 2: TYPE (Manual Editor) -->
+        <div id="panel-type" class="panel">
+            <div class="split-view">
+                <div class="text-area-container" style="flex: 1;">
+                    <div class="toolbar">
+                        <label for="rt-input"></label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="tool-btn" id="btn-paste"></button>
+                            <button class="tool-btn" id="btn-clear-input"></button>
+                        </div>
+                    </div>
+                    <!-- Placeholder set via JS -->
+                    <textarea id="rt-input"></textarea>
+                </div>
+                <div class="text-area-container" style="flex: 1;">
+                    <div class="toolbar">
+                        <label for="rt-output"></label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="tool-btn" id="btn-copy"></button>
+                            <button class="tool-btn" id="btn-inject"></button>
+                            <button class="tool-btn" id="btn-download-type"></button>
+                        </div>
+                    </div>
+                    <!-- Placeholder set via JS -->
+                    <textarea id="rt-output" readonly></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode 3: FILE -->
+        <div id="panel-file" class="panel">
+            <!-- File Upload Expander -->
+            <details id="file-upload-expander" open>
+                <summary
+                    style="cursor: pointer; font-weight: bold; font-size: 1.0rem; margin-bottom: 0.5rem; user-select: none;">
+                    📁 Upload
+                    File</summary>
+                <div class="file-drop-zone" id="dropZone">
+                    <p></p>
+                    <input type="file" id="fileInput" accept=".txt,.md,.srt,.vtt,.csv,.tsv,.json,.pdf"
+                        style="display: none;">
+                    <button class="btn" id="btn-choose-file" style="margin-top: 0.5rem;"></button>
+                </div>
+            </details>
+
+            <!-- CSV Options Section (Hidden by default, in expander) -->
+            <details id="csv-options-expander" style="display: none;">
+                <summary style="cursor: pointer; font-weight: bold; margin-bottom: 0.5rem; user-select: none;">⚙️ CSV
+                    Conversion Options</summary>
+                <div id="csv-options"
+                    style="flex-direction: column; gap: 1rem; padding: 0.5rem; background: var(--bg-secondary); border-radius: 8px;">
+                    <label id="lbl-select-columns" style="font-weight: bold;">Select Columns to Convert:</label>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.25rem;">
+                        <button type="button" id="btn-csv-select-all" class="tool-btn"
+                            style="font-size: 0.7rem;">全揀</button>
+                        <button type="button" id="btn-csv-deselect-all" class="tool-btn"
+                            style="font-size: 0.7rem;">全消</button>
+                    </div>
+                    <div id="csv-columns-list"
+                        style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.25rem; border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 4px;">
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                        <label id="lbl-output-mode" style="font-weight: bold;">Output Mode:</label>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                                <input type="radio" name="csv-mode" value="only" checked> Only Converted
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                                <input type="radio" name="csv-mode" value="original-plus"> Original + Converted
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                                <input type="radio" name="csv-mode" value="insert"> Insert to the original file
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; width: 100%; margin-top: 0.5rem;">
+                        <button id="btn-convert-csv" class="btn btn-primary" style="flex: 1;">Convert CSV</button>
+                        <button id="btn-reset-csv" class="btn"
+                            style="background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary);">Cancel</button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- JSON Options Section (Hidden by default) -->
+            <details id="json-options-expander" style="display: none;">
+                <summary style="cursor: pointer; font-weight: bold; margin-bottom: 0.5rem; user-select: none;">⚙️ JSON
+                    Conversion Options</summary>
+                <div id="json-options"
+                    style="flex-direction: column; gap: 1rem; padding: 0.5rem; background: var(--bg-secondary); border-radius: 8px;">
+                    <label id="lbl-select-keys" style="font-weight: bold;">Select Keys to Convert:</label>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.25rem;">
+                        <button type="button" id="btn-json-select-all" class="tool-btn"
+                            style="font-size: 0.7rem;">全揀</button>
+                        <button type="button" id="btn-json-deselect-all" class="tool-btn"
+                            style="font-size: 0.7rem;">全消</button>
+                    </div>
+                    <div id="json-keys-list"
+                        style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.25rem; border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 4px; font-family: monospace; font-size: 0.85rem;">
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                        <label id="lbl-json-output-mode" style="font-weight: bold;">Output Mode:</label>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                                <input type="radio" name="json-mode" value="only" checked> Only Converted
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                                <input type="radio" name="json-mode" value="original-plus"> Original + Converted
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                                <input type="radio" name="json-mode" value="insert"> Insert to original JSON
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; width: 100%; margin-top: 0.5rem;">
+                        <button id="btn-convert-json" class="btn btn-primary" style="flex: 1;">Convert JSON</button>
+                        <button id="btn-reset-json" class="btn"
+                            style="background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary);">Cancel</button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Subtitle Options Section (Hidden by default) -->
+            <details id="subtitle-options-expander" style="display: none;">
+                <summary style="cursor: pointer; font-weight: bold; margin-bottom: 0.5rem; user-select: none;">⚙️
+                    Subtitle
+                    Conversion Options</summary>
+                <div id="subtitle-options"
+                    style="flex-direction: column; gap: 1rem; padding: 0.5rem; background: var(--bg-secondary); border-radius: 8px;">
+                    <label id="lbl-select-lines" style="font-weight: bold;">Select Lines to Convert:</label>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                            <input type="radio" name="subtitle-mode" value="all" checked> All Lines
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                            <input type="radio" name="subtitle-mode" value="line1"> Line 1 Only
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                            <input type="radio" name="subtitle-mode" value="line2"> Line 2 Only
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                            <input type="radio" name="subtitle-mode" value="line3plus"> Line 3+
+                        </label>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; width: 100%; margin-top: 0.5rem;">
+                        <button id="btn-convert-subtitle" class="btn btn-primary" style="flex: 1;">Convert
+                            Subtitle</button>
+                        <button id="btn-reset-subtitle" class="btn"
+                            style="background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary);">Cancel</button>
+                    </div>
+                </div>
+            </details>
+
+            <div id="fileOutputSection" style="display: none; flex: 1; flex-direction: column;">
+                <div id="preview-messages"
+                    style="margin-bottom: 0.25rem; font-size: 0.7rem; color: var(--text-secondary); line-height: 1.3;">
+                    <span id="msg-general-warning"></span><span id="msg-specific-warning"
+                        style="display: none; color: var(--accent-color);"></span>
+                </div>
+                <div class="toolbar" style="flex-shrink: 0;">
+                    <label></label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="tool-btn" id="btn-reset-file" title="Upload New File">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </button>
+                        <button class="tool-btn" id="btn-copy-file"></button>
+                        <button class="tool-btn" id="btn-download-file"></button>
+                    </div>
+                </div>
+                <textarea id="outputPreview" readonly style="flex: 1;"></textarea>
+                <div id="csv-preview-table-container"
+                    style="display: none; flex: 1; overflow: auto; border: 1px solid var(--border-color); border-radius: 4px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode 4: HELP & SETTINGS -->
+        <div id="panel-help" class="panel">
+            <div class="settings-section"
+                style="padding: 1rem 1rem 0.5rem 1rem; border-bottom: 1px solid var(--border-color);">
+                <h3 id="header-settings" style="margin-top: 0; font-size: 1.1rem;"></h3>
+                <div class="setting-item" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span id="lbl-nasal-toggle"></span>
+                    <div class="switch-container">
+                        <input type="checkbox" id="nasal-superscript-toggle" class="switch-input" checked>
+                        <label for="nasal-superscript-toggle" class="switch-label">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <span id="lbl-tone6-toggle"></span>
+                    <div class="switch-container">
+                        <input type="checkbox" id="tone6-toggle" class="switch-input">
+                        <label for="tone6-toggle" class="switch-label">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <span id="lbl-allcaps-toggle"></span>
+                    <div class="switch-container">
+                        <input type="checkbox" id="all-caps-toggle" class="switch-input" checked>
+                        <label for="all-caps-toggle" class="switch-label">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item" style="margin-top: 1.5rem; text-align: center;">
+                    <button id="btn-run-test" class="btn-secondary"
+                        style="width: 100%; justify-content: center;"></button>
+                </div>
+
+                <div class="setting-item"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <span id="lbl-render-md-toggle"></span>
+                    <div class="switch-container">
+                        <input type="checkbox" id="render-md-toggle" class="switch-input">
+                        <label for="render-md-toggle" class="switch-label">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <span id="lbl-include-urls-toggle"></span>
+                    <div class="switch-container">
+                        <input type="checkbox" id="include-urls-toggle" class="switch-input" checked>
+                        <label for="include-urls-toggle" class="switch-label">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item" style="margin-top: 1rem; text-align: center;">
+                    <button id="btn-reset-settings" class="btn-secondary"
+                        style="width: 100%; justify-content: center;"></button>
+                </div>
+            </div>
+
+            <div class="help-section" style="padding: 0.5rem 1rem 1rem 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <h3 id="header-help" style="font-size: 1.1rem; margin: 0;"></h3>
+                    <button id="btn-help-lang" class="btn-secondary" style="font-size: 0.8rem; padding: 2px 8px;">
+                        English
+                    </button>
+                </div>
+                <!-- Help content loaded from docs/HELP.md -->
+                <div id="help-markdown-content" class="help-content"
+                    style="font-size: 0.9rem; line-height: 1.6; color: var(--text-primary);">
+                    <p style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                        載入說明中... (Loading help...)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer"></footer>
+    </div>
+
+    <!-- PDF.js Library (local) -->
+    <script src="pdf.min.js"></script>
+    <!-- UI Config must load before or concurrent with simple assignment logic -->
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="ui_config.js"></script>
+    <!-- Turndown for HTML to Markdown conversion -->
+    <script src="turndown.js"></script>
+    <script src="turndown-plugin-gfm.js"></script>
+    <script src="converter.js"></script>
+    <script src="sidepanel.js"></script>
+</body>
+
+</html>

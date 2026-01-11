@@ -1,0 +1,133 @@
+@font-face {
+    font-family: 'ChiayiCity';
+    src: url('fonts/ChiayiCity.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Huninn';
+    src: url('fonts/jf-openhuninn-2.1.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+:root {
+    /* Colors - "Professional & Low-key" (Slate Palette) */
+    --color-primary: #0f172a;
+    /* Slate-900 (Almost Black) for high contrast actions */
+    --color-primary-text: #ffffff;
+
+    --color-accent: #3b82f6;
+    /* Blue-500 for subtle highlights/links */
+
+    --color-bg-main: #f8fafc;
+    /* Slate-50 */
+    --color-bg-secondary: #e2e8f0;
+    /* Slate-200 */
+    --color-bg-tertiary: #cbd5e1;
+    /* Slate-300 */
+
+    --color-surface: #ffffff;
+
+    --color-border: #cbd5e1;
+    /* Slate-300 */
+    --color-border-subtle: #e2e8f0;
+    /* Slate-200 */
+
+    --color-text-main: #1e293b;
+    /* Slate-800 */
+    --color-text-secondary: #64748b;
+    /* Slate-500 */
+
+    --color-bg-hover: #f1f5f9;
+    /* Slate-100 */
+
+    --color-shadow: rgba(148, 163, 184, 0.15);
+    /* Slate toned shadow */
+    --color-focus-ring: rgba(59, 130, 246, 0.2);
+
+    /* Typography */
+    --font-family-base: 'ChiayiCity', "Times New Roman", serif;
+    --font-family-input: 'Huninn', "Noto Sans", sans-serif;
+    --font-size-base: 1rem;
+    /* 16px */
+    --font-size-sm: 0.875rem;
+    /* 14px */
+    --font-size-xs: 0.75rem;
+    /* 12px */
+    --font-size-xxs: 0.75rem;
+    /* 11px */
+    --font-size-h1: 0.85rem;
+    /* Reduced header size */
+
+    --content-font-size: 1rem;
+    /* Adjustable user font size */
+
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+
+    --line-height-tight: 1.25;
+    --line-height-base: 1.5;
+    --line-height-relaxed: 1.625;
+
+    /* Spacing */
+    --spacing-xxs: 0.25rem;
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+
+    /* Layout */
+    --panel-width: 600px;
+    --panel-min-height: 400px;
+
+    /* Radius - Slightly softer */
+    --border-radius-sm: 6px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-pill: 9999px;
+
+    --textarea-height: 140px;
+
+    /* Logo Settings */
+    --logo-glitch-filter: drop-shadow(-2px 0px 0px #32cd32) drop-shadow(2px 0px 0px #ff6347);
+}
+
+[data-theme="dark"] {
+    --color-primary: #3b82f6;
+    /* Blue-500 in dark mode for visibility */
+    --color-primary-text: #ffffff;
+
+    --color-accent: #60a5fa;
+    /* Blue-400 */
+
+    --color-bg-main: #0f172a;
+    /* Slate-900 */
+    --color-bg-secondary: #1e293b;
+    /* Slate-800 */
+    --color-bg-tertiary: #334155;
+    /* Slate-700 */
+
+    --color-surface: #1e293b;
+    /* Slate-800 */
+
+    --color-border: #334155;
+    /* Slate-700 */
+    --color-border-subtle: #1e293b;
+
+    --color-text-main: #f8fafc;
+    /* Slate-50 */
+    --color-text-secondary: #94a3b8;
+    /* Slate-400 */
+
+    --color-bg-hover: #334155;
+    /* Slate-700 */
+
+    --color-shadow: rgba(0, 0, 0, 0.4);
+    --color-focus-ring: rgba(59, 130, 246, 0.2);
+
+    /* Logo Settings (Dark Mode) */
+    --logo-glitch-filter: drop-shadow(-2px 0px 0px rgba(50, 205, 50, 0.5)) drop-shadow(2px 0px 0px rgba(255, 99, 71, 0.5));
+}

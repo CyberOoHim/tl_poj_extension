@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TL to POJ Converter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>TL -> POJ 隨時轉</h1>
+            <p class="subtitle">Tâi-lô to Pe̍h-ōe-jī 轉換器</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-realtime">拍隨轉</button>
+            <button class="tab-btn" id="tab-file">轉書類</button>
+        </div>
+
+        <!-- Real-time Panel -->
+        <div id="panel-realtime" class="panel active">
+            <div class="split-view">
+                <div class="text-area-container">
+                    <div class="toolbar">
+                        <label for="rt-input">TL / TL & POJ 帶數字調號</label>
+                        <button class="tool-btn" id="btn-paste">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                </path>
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                            </svg>
+                            貼 TL
+                        </button>
+                    </div>
+                    <textarea id="rt-input" placeholder="拍/貼 TL he̍k-chiá TL/POJ 標數字調號..."
+                        spellcheck="false"></textarea>
+                </div>
+                <!-- Arrow separator or similar could be nice, but stick to original layout mostly -->
+                <div class="text-area-container">
+                    <div class="toolbar">
+                        <label for="rt-output">POJ 輸出</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="tool-btn" id="btn-copy">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                Khó͘
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="rt-output" readonly placeholder="POJ 輸出..." spellcheck="false"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Converter Panel -->
+        <div id="panel-file" class="panel">
+            <div class="file-drop-zone" id="dropZone">
+                <p>Kā 書類 拖來 chia</p>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0.5rem 0;">ia̍h-sī</p>
+                <input type="file" id="fileInput" accept=".txt,.html,.md" style="display: none;">
+                <button class="btn" id="btn-choose-file">Ap-ló͘ 書類</button>
+            </div>
+
+            <div id="fileOutputSection" style="display: none;">
+                <div class="toolbar">
+                    <label>轉換結果</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="tool-btn" id="btn-copy-file">
+                            Khó͘
+                        </button>
+                        <!-- Download might be tricky in popup depending on permissions/sandboxing, but usually works via blob URL -->
+                        <button class="tool-btn" id="btn-download-file">
+                            Táng-ló͘
+                        </button>
+                    </div>
+                </div>
+                <textarea id="outputPreview" readonly placeholder="Output preview..."></textarea>
+            </div>
+        </div>
+    </div>
+    <script src="converter.js"></script>
+    <script src="popup.js"></script>
+</body>
+
+</html>

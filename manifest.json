@@ -1,0 +1,59 @@
+{
+  "manifest_version": 3,
+  "name": "TL -> POJ 隨時轉",
+  "version": "1.0",
+  "description": "Tâi-lô to Pe̍h-ōe-jī 轉換器",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "contextMenus",
+    "sidePanel",
+    "tabs",
+    "clipboardRead",
+    "storage",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "TL -> POJ 隨時轉"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "ui_config.js",
+        "turndown.js",
+        "turndown-plugin-gfm.js",
+        "converter.js",
+        "content_script.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "fonts/ChiayiCity.ttf",
+        "fonts/jf-openhuninn-2.1.ttf"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

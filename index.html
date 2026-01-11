@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TL -> POJ 隨時轉 | Tâi-lô to Pe̍h-ōe-jī Converter</title>
+    <meta name="description"
+        content="Instant Tâi-lô (TL) to POJ converter for web pages, typing, and files. Privacy-focused, runs 100% locally.">
+    <link rel="icon" type="image/png" href="images/icon512.png">
+    <style>
+        :root {
+            /* Black Bear Color Palette */
+            --primary: #e07b39;
+            /* Orange/tan from bear face */
+            --primary-dark: #c66a2e;
+            /* Darker orange */
+            --bg-dark: #1a1f2e;
+            /* Dark navy like bear body */
+            --bg-card: #252b3d;
+            /* Slightly lighter navy */
+            --text-primary: #f5f5f5;
+            /* Clean white */
+            --text-secondary: #9ca3af;
+            /* Muted gray */
+            --accent: #4ade80;
+            /* Green accent from icon outline */
+            --accent-orange: #e07b39;
+            /* Orange accent */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1a2e 50%, var(--bg-dark) 100%);
+        }
+
+        .hero img.logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 1.5rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(224, 123, 57, 0.3);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(224, 123, 57, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            color: var(--accent);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+        }
+
+        .feature-card p.taigi {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: var(--accent);
+            opacity: 0.8;
+        }
+
+        /* Screenshots Section */
+        .screenshots {
+            padding: 4rem 2rem;
+            background: var(--bg-card);
+        }
+
+        .screenshots h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .screenshot-gallery {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+            padding: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .screenshot-gallery img {
+            height: 400px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+        }
+
+        /* Footer Links */
+        .footer-links {
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .footer-links h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .link-grid {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .link-grid a {
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .link-grid a:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Help Section */
+        .help-section {
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .help-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+
+        .help-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .help-tab {
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .help-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .help-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .help-content {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .help-content h2,
+        .help-content h3,
+        .help-content h4 {
+            color: var(--primary);
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .help-content h2:first-child {
+            margin-top: 0;
+        }
+
+        .help-content p {
+            color: var(--text-secondary);
+            margin: 0.5rem 0;
+        }
+
+        .help-content ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .help-content li {
+            color: var(--text-secondary);
+            margin: 0.25rem 0;
+        }
+
+        .help-content code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--accent);
+        }
+
+        .help-content hr {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 1.5rem 0;
+        }
+
+        .help-content strong {
+            color: var(--text-primary);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1rem;
+            }
+
+            .screenshot-gallery img {
+                height: 280px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <img src="images/icon512.png" alt="TL -> POJ Logo" class="logo">
+        <h1></h1>
+        <p class="subtitle"></p>
+        <div class="cta-buttons">
+            <a href="#" class="btn btn-primary"></a>
+            <a href="#" class="btn btn-secondary"></a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2></h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3></h3>
+                <p></p>
+                <p class="taigi"></p>
+            </div>
+            <div class="feature-card">
+                <h3></h3>
+                <p></p>
+                <p class="taigi"></p>
+            </div>
+            <div class="feature-card">
+                <h3></h3>
+                <p></p>
+                <p class="taigi"></p>
+            </div>
+            <div class="feature-card">
+                <h3></h3>
+                <p></p>
+                <p class="taigi"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Help Section -->
+    <section class="help-section">
+        <h2></h2>
+        <div class="help-tabs">
+            <button class="help-tab active" data-lang="taigi"></button>
+            <button class="help-tab" data-lang="english"></button>
+        </div>
+        <div class="help-content" id="help-content">
+            <p style="text-align: center; color: var(--text-secondary);"></p>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section class="screenshots">
+        <h2></h2>
+        <div class="screenshot-gallery">
+            <img src="images/screenshot-scan-selected.png" alt="Scan Mode - Selected Text">
+            <img src="images/screenshot-fetch-article.png" alt="Fetch Article">
+            <img src="images/screenshot-onsite-scan.png" alt="On-site Scan">
+            <img src="images/screenshot-type-mode.png" alt="Type Mode">
+            <img src="images/screenshot-file-mode.png" alt="File Mode">
+        </div>
+    </section>
+
+    <!-- Footer Links -->
+    <section class="footer-links">
+        <h2 id="docs-title"></h2>
+        <div class="link-grid">
+            <a href="docs/PRIVACY.md" id="link-privacy"></a>
+            <a href="docs/LEGAL.md" id="link-legal"></a>
+            <a href="docs/PERMISSIONS.md" id="link-permissions"></a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p id="footer-text"></p>
+    </footer>
+
+    <script>
+        // ========================================
+        // UI CONSTANTS - All text strings for easy maintenance
+        // ========================================
+        const UI_CONSTANTS = {
+            // Meta
+            pageTitle: 'TL 拼音 -> POJ 隨時轉 | Tâi-lô Pheng-im to Pe̍h-ōe-jī Converter',
+            metaDescription: 'Instant Tâi-lô (TL) to POJ converter for web pages, typing, and files. Privacy-focused, runs 100% locally.',
+
+            // Hero Section
+            hero: {
+                title: 'TL 拼音 -> POJ 隨時轉',
+                subtitleEn: 'Instant Tâi-lô (TL) to Taiwanese Pe̍h-ōe-jī (POJ) converter for web pages, typing, and files.',
+                subtitleTaigi: '隨時 kā 網頁、拍字、文件 ê 台羅拼音 (TL Pheng-im ) 轉做台灣白話字 (POJ)。',
+                ctaInstall: '🌐 Install from Chrome Store (Under Submission)',
+                ctaGithub: '📦 View on GitHub',
+                chromeStoreUrl: 'https://chrome.google.com/webstore/detail/placeholder',
+                githubUrl: 'https://github.com/CyberOoHim/tl_poj_extension'
+            },
+
+            // Features Section
+            features: {
+                title: '✨ Features / 功能',
+                items: [
+                    {
+                        icon: '🔍',
+                        titleEn: 'Scan Mode',
+                        titleTaigi: '轉網頁',
+                        descEn: 'Select text on any webpage to convert TL to POJ instantly. Toggle "Live Mode" to convert entire pages in-place.',
+                        descTaigi: '揀網頁頂懸 ê 文字，隨時 tī 邊欄 kā 轉做 POJ。開「就地轉」會使原位 kā 規頁網頁轉好勢。'
+                    },
+                    {
+                        icon: '⌨️',
+                        titleEn: 'Type Mode',
+                        titleTaigi: '拍字轉',
+                        descEn: 'Type Tâi-lô with numeric tones (tsui2) or diacritics (tsuí) and see POJ output instantly. Inject directly into any input field.',
+                        descTaigi: '拍數字調號 (tsui2)，符號調號 (tsuí) TL a̍h-sī POJ 符號調號（chui2）隨看著 POJ（chúi）。會使直接 ka 貼入去網頁 ê 輸入框。'
+                    },
+                    {
+                        icon: '📁',
+                        titleEn: 'File Mode',
+                        titleTaigi: '轉書類',
+                        descEn: 'Convert .txt, .md, .srt, .csv, .json, and .pdf files. Choose specific columns or subtitle lines to convert.',
+                        descTaigi: '支援 .txt, .md, .srt, .csv, .json, .pdf 檔案。會使揀欲轉 ê JSON key, 表格直逝 ah-sī 字幕逝。'
+                    },
+                    {
+                        icon: '🔒',
+                        titleEn: '100% Local',
+                        titleTaigi: '100pha 在地處理',
+                        descEn: 'All processing happens in your browser. No data is sent to any server. Your privacy is guaranteed.',
+                        descTaigi: 'Lóng-chóng tī 你 ê bu-láu-soh 內底運作，無傳任何資料去外口。保證你 ê 隱私。'
+                    }
+                ]
+            },
+
+            // Screenshots Section
+            screenshots: {
+                title: '📸 Screenshots / Hip 幕'
+            },
+
+            // Help Section
+            help: {
+                title: '❓ Help / 解說',
+                tabTaigi: '台語',
+                tabEnglish: 'English',
+                loading: 'Tng teh 掠 / Loading...',
+                loadError: '掠無好勢 / Failed to load'
+            },
+
+            // Documents Section
+            docs: {
+                title: '📚 Documentation / 書類',
+                privacy: '🔐 Privacy Policy / 隱私權政策',
+                legal: '⚖️ Legal & Licenses / 法律 kap 許可',
+                permissions: '🔑 Permissions / 權限'
+            },
+
+            // Footer
+            footer: {
+                copyright: '© 2026',
+                author: 'Cyber O͘-hîm ki-tē',
+                authorUrl: 'https://cyberoohim.github.io/',
+                license: 'Licensed under MIT'
+            }
+        };
+
+        // ========================================
+        // HYDRATE UI - Apply constants to DOM
+        // ========================================
+        function hydrateUI() {
+            const C = UI_CONSTANTS;
+
+            // Hero
+            document.querySelector('.hero h1').textContent = C.hero.title;
+            document.querySelector('.hero .subtitle').innerHTML =
+                `${C.hero.subtitleEn}<br>${C.hero.subtitleTaigi}`;
+            document.querySelector('.btn-primary').textContent = C.hero.ctaInstall;
+            document.querySelector('.btn-primary').href = C.hero.chromeStoreUrl;
+            document.querySelector('.btn-secondary').textContent = C.hero.ctaGithub;
+            document.querySelector('.btn-secondary').href = C.hero.githubUrl;
+
+            // Features
+            document.querySelector('.features h2').textContent = C.features.title;
+            const featureCards = document.querySelectorAll('.feature-card');
+            C.features.items.forEach((item, i) => {
+                if (featureCards[i]) {
+                    featureCards[i].querySelector('h3').textContent = `${item.icon} ${item.titleEn} / ${item.titleTaigi}`;
+                    featureCards[i].querySelector('p').textContent = item.descEn;
+                    featureCards[i].querySelector('.taigi').textContent = item.descTaigi;
+                }
+            });
+
+            // Screenshots
+            document.querySelector('.screenshots h2').textContent = C.screenshots.title;
+
+            // Help
+            document.querySelector('.help-section h2').textContent = C.help.title;
+            document.querySelectorAll('.help-tab')[0].textContent = C.help.tabTaigi;
+            document.querySelectorAll('.help-tab')[1].textContent = C.help.tabEnglish;
+            document.querySelector('#help-content p').textContent = C.help.loading;
+
+            // Docs
+            document.getElementById('docs-title').textContent = C.docs.title;
+            document.getElementById('link-privacy').textContent = C.docs.privacy;
+            document.getElementById('link-legal').textContent = C.docs.legal;
+            document.getElementById('link-permissions').textContent = C.docs.permissions;
+
+            // Footer
+            document.getElementById('footer-text').innerHTML =
+                `${C.footer.copyright} <a href="${C.footer.authorUrl}">${C.footer.author}</a> | ${C.footer.license}`;
+        }
+
+        // ========================================
+        // MARKDOWN RENDERER
+        // ========================================
+        function renderMarkdown(md) {
+            if (!md) return '';
+            let html = md
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            const lines = html.split('\n');
+            const result = [];
+            let inList = false;
+
+            for (let line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed) {
+                    if (inList) { result.push('</ul>'); inList = false; }
+                    continue;
+                }
+                if (trimmed.startsWith('### ')) {
+                    if (inList) { result.push('</ul>'); inList = false; }
+                    result.push(`<h4>${trimmed.substring(4)}</h4>`);
+                } else if (trimmed.startsWith('## ')) {
+                    if (inList) { result.push('</ul>'); inList = false; }
+                    result.push(`<h3>${trimmed.substring(3)}</h3>`);
+                } else if (trimmed.startsWith('# ')) {
+                    if (inList) { result.push('</ul>'); inList = false; }
+                    result.push(`<h2>${trimmed.substring(2)}</h2>`);
+                } else if (trimmed === '---') {
+                    if (inList) { result.push('</ul>'); inList = false; }
+                    result.push('<hr>');
+                } else if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+                    if (!inList) { result.push('<ul>'); inList = true; }
+                    result.push(`<li>${trimmed.substring(2)}</li>`);
+                } else {
+                    if (inList) { result.push('</ul>'); inList = false; }
+                    result.push(`<p>${trimmed}</p>`);
+                }
+            }
+            if (inList) result.push('</ul>');
+
+            return result.join('\n')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/`([^`]+)`/g, '<code>$1</code>');
+        }
+
+        // ========================================
+        // HELP LOADER
+        // ========================================
+        async function loadHelp(lang) {
+            const container = document.getElementById('help-content');
+            const filename = lang === 'taigi' ? 'docs/HELP.md' : 'docs/HELP.en.md';
+
+            try {
+                const response = await fetch(filename);
+                if (!response.ok) throw new Error('Failed to load');
+                const markdown = await response.text();
+                container.innerHTML = renderMarkdown(markdown);
+            } catch (error) {
+                container.innerHTML = `<p style="color: var(--text-secondary); text-align: center;">${UI_CONSTANTS.help.loadError}<br><small>${error.message}</small></p>`;
+            }
+        }
+
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hydrate UI with constants
+            hydrateUI();
+
+            // Tab switching
+            document.querySelectorAll('.help-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.help-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    loadHelp(tab.dataset.lang);
+                });
+            });
+
+            // Load default help (Taigi)
+            loadHelp('taigi');
+        });
+    </script>
+</body>
+
+</html>
