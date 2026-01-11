@@ -96,7 +96,7 @@ This extension uses the following open-source libraries:
     (掠網頁文章)
 * **Turndown** (MIT) - For HTML to Markdown conversion.
     (轉 Markdown)
-* **Fonts / 字型:** Includes **Huninn (粉圓體)** and **Chiayi City Font (嘉市體)** (SIL Open Font License 1.1).
+* **Fonts / 字型:** Includes **justfont Huninn (粉圓體)** and **Chiayi City Font (嘉市體)** (SIL Open Font License 1.1).
 
 ---
 © 2026 Cyber O͘-hîm ki-tē

@@ -117,9 +117,9 @@ Currently, this extension is in development and can be installed via "Load Unpac
 
     **隱私政策：** 請看 [PRIVACY.md](docs/PRIVACY.md) 了解阮 ê 隱私政策 kah 資料處理方式。
 
-* **Third-Party Assets:** See [LEGAL.md](docs/LEGAL.md) for details on libraries and fonts used (PDF.js, Turndown, Huninn Font, etc.).
+* **Third-Party Assets:** See [LEGAL.md](docs/LEGAL.md) for details on libraries and fonts used (PDF.js, Turndown, justfont Huninn Font, etc.).
 
-    **第三方資源：** 請看 [LEGAL.md](docs/LEGAL.md) 了解阮使用 ê 外部程式庫 kah 字型 (PDF.js, Turndown, 粉圓體等等) ê 詳細資訊。
+    **第三方資源：** 請看 [LEGAL.md](docs/LEGAL.md) 了解阮使用 ê 外部程式庫 kah 字型 (PDF.js, Turndown, justfont 粉圓體等等) ê 詳細資訊。
 
 ---
 
