@@ -120,6 +120,14 @@
             color: var(--accent);
         }
 
+        .cta-separator {
+            width: 200px;
+            border: none;
+            border-top: 1px solid var(--text-secondary);
+            margin: 1.5rem 0 1rem 0;
+            opacity: 0.5;
+        }
+
         /* Features Section */
         .features {
             padding: 4rem 2rem;
@@ -172,10 +180,38 @@
             background: var(--bg-card);
         }
 
-        .screenshots h2 {
+        .screenshots details {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .screenshots summary {
+            cursor: pointer;
             text-align: center;
             font-size: 2rem;
-            margin-bottom: 2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            padding: 1rem;
+            list-style: none;
+        }
+
+        .screenshots summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .screenshots summary::before {
+            content: '▶ ';
+            color: var(--accent);
+            transition: transform 0.2s ease;
+            display: inline-block;
+        }
+
+        .screenshots details[open] summary::before {
+            content: '▼ ';
+        }
+
+        .screenshots summary:hover {
+            color: var(--accent);
         }
 
         .screenshot-gallery {
@@ -423,6 +459,8 @@
             <a href="#" class="btn btn-secondary btn-github"></a>
             <a href="#" class="btn btn-secondary btn-zip"></a>
         </div>
+        <hr class="cta-separator">
+        <a href="#" class="btn btn-secondary btn-inline"></a>
     </section>
 
     <!-- Features Section -->
@@ -466,14 +504,16 @@
 
     <!-- Screenshots Section -->
     <section class="screenshots">
-        <h2></h2>
-        <div class="screenshot-gallery">
-            <img src="images/screenshot-scan-selected.png" alt="Scan Mode - Selected Text">
-            <img src="images/screenshot-fetch-article.png" alt="Fetch Article">
-            <img src="images/screenshot-onsite-scan.png" alt="On-site Scan">
-            <img src="images/screenshot-type-mode.png" alt="Type Mode">
-            <img src="images/screenshot-file-mode.png" alt="File Mode">
-        </div>
+        <details id="screenshots-expander">
+            <summary><span id="screenshots-title"></span></summary>
+            <div class="screenshot-gallery">
+                <img data-src="images/screenshot-scan-selected.png" alt="Scan Mode - Selected Text">
+                <img data-src="images/screenshot-fetch-article.png" alt="Fetch Article">
+                <img data-src="images/screenshot-onsite-scan.png" alt="On-site Scan">
+                <img data-src="images/screenshot-type-mode.png" alt="Type Mode">
+                <img data-src="images/screenshot-file-mode.png" alt="File Mode">
+            </div>
+        </details>
     </section>
 
     <!-- Footer Links -->
@@ -508,9 +548,11 @@
                 ctaInstall: '🌐 Úi Chrome Store Tàu (Koh teh 等審查)',
                 ctaGithub: '📦 Ùi GitHub Tàu (For Developer)',
                 ctaZip: '⬇️ 直接 táng-ló͘ .zip (Direct Download)',
+                ctaInline: '🌐 Online Version (線頂版隨用，無轉網頁)',
                 chromeStoreUrl: 'https://chrome.google.com/webstore/detail/placeholder',
                 githubUrl: 'https://github.com/CyberOoHim/tl_poj_extension',
-                zipUrl: 'packed/extension_20260111_1700.zip'
+                zipUrl: 'packed/extension_20260111_1700.zip',
+                inlineUrl: 'https://cyberoohim.github.io/pages/tl_poj_converter.html'
             },
 
             // Features Section
@@ -603,6 +645,13 @@
                 zipBtn.href = C.hero.zipUrl;
             }
 
+            // Inline Converter Button
+            const inlineBtn = document.querySelector('.btn-inline');
+            if (inlineBtn) {
+                inlineBtn.textContent = C.hero.ctaInline;
+                inlineBtn.href = C.hero.inlineUrl;
+            }
+
             // Features
             document.querySelector('.features h2').textContent = C.features.title;
             const featureCards = document.querySelectorAll('.feature-card');
@@ -614,8 +663,9 @@
                 }
             });
 
+
             // Screenshots
-            document.querySelector('.screenshots h2').textContent = C.screenshots.title;
+            document.getElementById('screenshots-title').textContent = C.screenshots.title;
 
             // Help
             document.querySelector('.help-section h2').textContent = C.help.title;
@@ -717,6 +767,21 @@
 
             // Load default help (Taigi)
             loadHelp('taigi');
+
+            // Screenshot lazy loading - only load images when expander opens
+            const screenshotsExpander = document.getElementById('screenshots-expander');
+            if (screenshotsExpander) {
+                screenshotsExpander.addEventListener('toggle', function () {
+                    if (this.open) {
+                        const lazyImages = this.querySelectorAll('img[data-src]');
+                        lazyImages.forEach(img => {
+                            if (!img.src) {
+                                img.src = img.dataset.src;
+                            }
+                        });
+                    }
+                });
+            }
         });
     </script>
 </body>
