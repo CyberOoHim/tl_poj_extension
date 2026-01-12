@@ -445,6 +445,10 @@
                 height: 280px;
             }
         }
+
+        .lazy-hidden {
+            display: none;
+        }
     </style>
 </head>
 
@@ -504,16 +508,17 @@
 
     <!-- Screenshots Section -->
     <section class="screenshots">
-        <details id="screenshots-expander">
-            <summary><span id="screenshots-title"></span></summary>
-            <div class="screenshot-gallery">
-                <img data-src="images/screenshot-scan-selected.png" alt="Scan Mode - Selected Text">
-                <img data-src="images/screenshot-fetch-article.png" alt="Fetch Article">
-                <img data-src="images/screenshot-onsite-scan.png" alt="On-site Scan">
-                <img data-src="images/screenshot-type-mode.png" alt="Type Mode">
-                <img data-src="images/screenshot-file-mode.png" alt="File Mode">
-            </div>
-        </details>
+        <h2 id="screenshots-title"></h2>
+        <div class="screenshot-gallery">
+            <img src="images/screenshot-scan-selected.png" alt="Scan Mode - Selected Text">
+            <img data-src="images/screenshot-fetch-article.png" class="lazy-hidden" alt="Fetch Article">
+            <img data-src="images/screenshot-onsite-scan.png" class="lazy-hidden" alt="On-site Scan">
+            <img data-src="images/screenshot-type-mode.png" class="lazy-hidden" alt="Type Mode">
+            <img data-src="images/screenshot-file-mode.png" class="lazy-hidden" alt="File Mode">
+        </div>
+        <div style="text-align: center; margin-top: 2rem;">
+            <button id="btn-see-more" class="btn btn-secondary" style="cursor: pointer;"></button>
+        </div>
     </section>
 
     <!-- Footer Links -->
@@ -592,7 +597,8 @@
 
             // Screenshots Section
             screenshots: {
-                title: '📸 Screenshots / Hip 幕'
+                title: '📸 Screenshots / Hip 幕',
+                seeMore: '👀 See More / 看 koh-khah 濟'
             },
 
             // Help Section
@@ -666,6 +672,10 @@
 
             // Screenshots
             document.getElementById('screenshots-title').textContent = C.screenshots.title;
+            const seeMoreBtn = document.getElementById('btn-see-more');
+            if (seeMoreBtn) {
+                seeMoreBtn.textContent = C.screenshots.seeMore;
+            }
 
             // Help
             document.querySelector('.help-section h2').textContent = C.help.title;
@@ -768,18 +778,23 @@
             // Load default help (Taigi)
             loadHelp('taigi');
 
-            // Screenshot lazy loading - only load images when expander opens
-            const screenshotsExpander = document.getElementById('screenshots-expander');
-            if (screenshotsExpander) {
-                screenshotsExpander.addEventListener('toggle', function () {
-                    if (this.open) {
-                        const lazyImages = this.querySelectorAll('img[data-src]');
-                        lazyImages.forEach(img => {
-                            if (!img.src) {
-                                img.src = img.dataset.src;
-                            }
-                        });
-                    }
+            // Screenshot lazy loading - see more button
+            const seeMoreBtn = document.getElementById('btn-see-more');
+            if (seeMoreBtn) {
+                seeMoreBtn.addEventListener('click', function () {
+                    const lazyImages = document.querySelectorAll('.screenshot-gallery img.lazy-hidden');
+
+                    lazyImages.forEach(img => {
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            // Add a small fade-in effect if desired, or just show
+                            img.onload = () => img.classList.add('loaded');
+                        }
+                        img.classList.remove('lazy-hidden');
+                    });
+
+                    // Hide the button after clicking
+                    this.parentElement.style.display = 'none';
                 });
             }
         });
