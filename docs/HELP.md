@@ -1,5 +1,8 @@
 # Help & Settings / 說明 & 設定
 
+* **注意**: Lán 會用得拍 台羅數字調號 kap 符號調號 TL a̍h-sī POJ 數字調號 lóng-chóng 會轉做 POJ 符號調號。
+* **注意**: 假使有其他外語拄á好部份 chham 台羅 相siâng，會誤轉。這是 lán ê 使用限制。用走脫語法 thang 避免，chhi̍h **頂懸頭1粒** chhi̍h-liú 看例。M̄-koh 若現轉網頁 tō 無法度。
+
 ## 1. 轉網頁 (Scan Mode)
 
 會tàng直接讀網頁頂懸轉好 POJ ê TL。
@@ -7,10 +10,10 @@
 * **揀欲愛--ê 來轉**: 網頁頂懸揀文字，就會自動轉做 POJ 顯示 tī extension。
 * **就地轉 POJ 開關**: Kā 開--開，會用得 kā 規網頁 ê TL 直接轉做 POJ。
 * **轉 POJ 開關**: Kā 開--開，轉網頁 才會 kā TL 轉 POJ 顯示；若關--起来，就顯示原本的 TL。
-* **看 MD 開關**: "看 MD" 開--開，會 kā 結果用 Markdown 格式顯示，會使包括圖、影片等等 ê 網鍊（看 Markdown 帶 網鍊（URL）設定）。
+* **看 MD 開關**: "看 MD" 開--開，會 kā 結果用 Markdown 格式顯示，會使包括圖、影片等等 ê 網鍊（看 Markdown 帶 網鍊（URL）設定）。Táng-ló͘--ê 格式 chham 看著--ê 仝款。
+* **網址保留**: 所有的 URL (網鍊) lóng袂轉 POJ。
 * **注意**: 網頁結構厚變化，無法度保證掠--著 ê 規篇文章格式正確，內容 mā ài檢查。
 * **注意**: 有个網站會掠無，無掛保證。
-* **網址保留**: 所有的 URL (網鍊) lóng袂轉 POJ。
 
 ### 正chhi̍h單á (Context Menu)
 
@@ -41,10 +44,9 @@
 * **CSV/TSV**: 揀欲轉 ê 直逝(column)，會tàng揀 output 模式 (kan-ta 轉好--ê/原+轉/插--入去原表格)。
 * **JSON**: 揀欲轉 ê key，會tàng揀 output 模式 (kan-ta 轉好--ê/原+轉/插--入去原JSON)。
 * **SRT/VTT**: 若字幕有濟逝，會tàng揀欲轉佗一逝 (Lóng-chóng/頭逝/第2逝/第3+)。
-  * **注意**: 1. iPad 掠無 .srt，改做 .vtt a̍h-sī .txt。
-  * **注意**: 2. PDF 排版複雜 ê 讀了可能無好勢。
-  * **注意**: 3. 轉書類檔案 ài 細膩，若有濫英文 a̍h-sī 其他外語 ê 羅馬字 會誤轉。用走脫語法thang避免，chhi̍h上頂頭chhi̍h鈕看例。
-  * **注意**: 4. 欲貼去 Google Keep ài 先 拍空白 kā 伊輸入框 ê 提示消掉。
+  * **注意**: iPad 掠無 .srt，改做 .vtt a̍h-sī .txt。
+  * **注意**: PDF 排版複雜 ê 讀了可能無好勢。
+  * **注意**: 欲貼去 Google Keep ài 先 拍空白 kā 伊輸入框 ê 提示消掉。
 
 ## 4. 設定 (Settings)
 
@@ -69,23 +71,28 @@
 
 ## 阮 (About)
 
-TL -> POJ 隨時轉 Converter  
-Copyright © 2026 [Cyber O͘-hîm ki-tē](https://cyberoohim.github.io/)  
-Licensed under MIT License
+* TL -> POJ 隨時轉 Converter  
+* Copyright © 2026 [Cyber O͘-hîm ki-tē](https://cyberoohim.github.io/)  
+* Licensed under MIT License
 
 ### 用--著 ê 物 (Libraries & Assets)
 
 **PDF.js** (Mozilla Foundation)  
-Licensed under Apache License 2.0
+
+* Licensed under Apache License 2.0
 
 **Readability.js** (Mozilla Foundation)  
-Licensed under Apache License 2.0
+
+* Licensed under Apache License 2.0
 
 **Turndown.js** (Dom Christie)  
-Licensed under MIT License
+
+* Licensed under MIT License
 
 **Huninn** (justfont)  
-Licensed under SIL Open Font License 1.1
+
+* Licensed under SIL Open Font License 1.1
 
 **Chiayi City Font** (Chiayi City Gov)  
-Licensed under SIL Open Font License 1.1
+
+* Licensed under SIL Open Font License 1.1

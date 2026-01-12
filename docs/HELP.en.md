@@ -1,5 +1,8 @@
 # Help & Settings / 說明 & 設定
 
+* **Note**: You can type TL with numeric tones or symbolic tones, or POJ with numeric tones; all will be converted to POJ with symbolic tones.
+* **Note**: If other foreign languages happen to match TL patterns, they might be mistranslated. This is a limitation. Use escape syntax to avoid this; click **the first button on the top** to see examples. However, this cannot be avoided when directly scanning web pages.
+
 ## 1. 轉網頁 (Scan Mode)
 
 Directly reads and converts KIP (TL) from web pages into POJ.
@@ -7,10 +10,10 @@ Directly reads and converts KIP (TL) from web pages into POJ.
 * **揀欲愛--ê 來轉 (Select text to convert)**: Select text on the webpage, and it will automatically convert to POJ and display in the extension.
 * **就地轉 POJ 開關 (Live Convert Switch)**: Turn ON to convert all TL text on the entire webpage directly into POJ in-place.
 * **轉 POJ 開關 (Web Conversion Switch)**: Turn ON so that "Scan Page" converts found TL to POJ; if OFF, it displays the original TL text.
-* **看 MD 開關 (View MD Switch)**: Turn ON "View MD" to display the result in Markdown format, which can include images, videos, etc. (See Markdown URL setting).
+* **看 MD 開關 (View MD Switch)**: Turn ON "View MD" to display the result in Markdown format, which can include images, videos, etc. (See Markdown URL setting). The downloaded format is the same as what you see.
+* **URL Preservation**: All URLs (links) remain unconverted in POJ.
 * **Note**: Webpage structures vary greatly. We cannot guarantee the format of captured full articles is always correct; please check the content manually.
 * **Note**: Some websites may block content extraction; no guarantees are made.
-* **URL Preservation**: All URLs (links) remain unconverted in POJ.
 
 ### 正chhi̍h單á (Context Menu)
 
@@ -41,10 +44,9 @@ Convert data files.
 * **CSV/TSV**: Select the column to convert, and choose output mode (Only converted / Original + Converted / Insert after original column).
 * **JSON**: Select key to convert, and choose output mode (Only converted / Original + Converted / Insert after original key).
 * **SRT/VTT**: If subtitles use multiple lines, choose which line to convert (All / 1st line / 2nd line / 3rd+ line).
-  * **Note**: 1. iPad cannot capture .srt; rename to .vtt or .txt.
-  * **Note**: 2. PDF layout complexities may result in imperfect text extraction.
-  * **Note**: 3. Be careful when converting files mixed with English or other languages using Roman characters; they may be misconverted. Use escape syntax to avoid this (click the top button to see examples).
-  * **Note**: 4. To paste into Google Keep, type a space first to clear the input placeholder.
+  * **Note**: iPad cannot capture .srt; rename to .vtt or .txt.
+  * **Note**: PDF layout complexities may result in imperfect text extraction.
+  * **Note**: To paste into Google Keep, type a space first to clear the input placeholder.
 
 ## 4. 設定 (Settings)
 
@@ -69,23 +71,28 @@ Three Toggles:
 
 ## About Us (About)
 
-TL -> POJ Sûi-sî-choán Converter  
-Copyright © 2026 [Cyber O͘-hîm ki-tē](https://cyberoohim.github.io/)  
-Licensed under MIT License
+* TL -> POJ Sûi-sî-choán Converter  
+* Copyright © 2026 [Cyber O͘-hîm ki-tē](https://cyberoohim.github.io/)  
+* Licensed under MIT License
 
 ### Libraries & Assets
 
 **PDF.js** (Mozilla Foundation)  
-Licensed under Apache License 2.0
+
+* Licensed under Apache License 2.0
 
 **Readability.js** (Mozilla Foundation)  
-Licensed under Apache License 2.0
+
+* Licensed under Apache License 2.0
 
 **Turndown.js** (Dom Christie)  
-Licensed under MIT License
+
+* Licensed under MIT License
 
 **Huninn** (justfont)  
-Licensed under SIL Open Font License 1.1
+
+* Licensed under SIL Open Font License 1.1
 
 **Chiayi City Font** (Chiayi City Gov)  
-Licensed under SIL Open Font License 1.1
+
+* Licensed under SIL Open Font License 1.1

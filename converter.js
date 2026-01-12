@@ -347,6 +347,35 @@ if (typeof window.TL_Converter === 'undefined') {
         }
       }
 
+      // 0c. Preserve POJ text (syllables with POJ-specific markers)
+      // POJ-specific characters: ⁿ (superscript n), o͘/O͘ (o with dot above)
+      // Match words/syllables containing these POJ markers and preserve them
+      const pojPlaceholders = [];
+
+      // Pattern explanation:
+      // - Word boundaries containing ⁿ or o͘/O͘ (POJ-specific characters)
+      // - Match the whole "word" (sequence of romanization characters with diacritics)
+      // - Romanization chars: letters, tone marks (combining diacritics), hyphens within words
+      const pojSyllablePattern = /[\p{L}\p{M}]+(?:ⁿ|o͘|O͘)[\p{L}\p{M}]*/gu;
+      // Also match syllables ending with ⁿ that might not be caught above
+      const pojNasalEndPattern = /[\p{L}\p{M}]+ⁿ/gu;
+      // And match standalone o͘/O͘ syllables  
+      const pojOoPattern = /[\p{L}\p{M}]*[oO]͘[\p{L}\p{M}]*/gu;
+
+      // First pass: preserve syllables with ⁿ
+      processedInput = processedInput.replace(pojNasalEndPattern, (match) => {
+        pojPlaceholders.push(match);
+        return `⟪POJ${pojPlaceholders.length - 1}⟫`;
+      });
+
+      // Second pass: preserve syllables with o͘/O͘ (that weren't already captured)
+      processedInput = processedInput.replace(pojOoPattern, (match) => {
+        // Skip if already a placeholder
+        if (match.includes('⟪POJ')) return match;
+        pojPlaceholders.push(match);
+        return `⟪POJ${pojPlaceholders.length - 1}⟫`;
+      });
+
       // 1. Convert TL-style tone marks to corresponding numbers
       const tl_soo = TLtiau_2_TLsoo(processedInput);
       // 2. Convert TL number-style to POJ number-style
@@ -354,9 +383,14 @@ if (typeof window.TL_Converter === 'undefined') {
       // 3. Convert POJ number-style to POJ tone marks
       let poj_tiau = POJsoo_2_POJtiau(poj_soo);
 
-      // 4. Restore escaped content
+      // 4a. Restore escaped content
       poj_tiau = poj_tiau.replace(/⟪ESC(\d+)⟫/g, (match, index) => {
         return escapes[parseInt(index)];
+      });
+
+      // 4b. Restore POJ content (preserved syllables with POJ-specific markers)
+      poj_tiau = poj_tiau.replace(/⟪POJ(\d+)⟫/g, (match, index) => {
+        return pojPlaceholders[parseInt(index)];
       });
 
       // 5. Restore URL/markdown link placeholders
@@ -598,7 +632,23 @@ if (typeof window.TL_Converter === 'undefined') {
         // Mixed with conversion
         { in: "a tsuí \\[tsuí\\] b", out: "a chúi tsuí b" },
         // Regular ] inside escape
-        { in: "\\[arr[0]\\]", out: "arr[0]" }
+        { in: "\\[arr[0]\\]", out: "arr[0]" },
+
+        // 8. POJ text preservation (POJ input should not be converted)
+        // Syllables with ⁿ (POJ nasal superscript) should be preserved
+        { in: "chiâⁿ", out: "chiâⁿ" },  // POJ stays POJ
+        { in: "siaⁿ", out: "siaⁿ" },    // POJ nasal syllable
+        { in: "koaⁿ", out: "koaⁿ" },    // POJ nasal with oa
+        // Syllables with o͘ (POJ o-dot) should be preserved
+        { in: "hó͘", out: "hó͘" },       // POJ o-dot syllable
+        { in: "gô͘", out: "gô͘" },       // POJ o-dot with tone
+        { in: "o͘", out: "o͘" },         // Standalone o-dot
+        // Mixed POJ and TL (POJ preserved, TL converted)
+        { in: "chiâⁿ tsuí", out: "chiâⁿ chúi" },  // POJ + TL
+        { in: "hó͘ oo", out: "hó͘ o͘" },           // POJ o͘ + TL oo
+        // Capital POJ
+        { in: "Chiâⁿ", out: "Chiâⁿ" },  // Capital POJ nasal
+        { in: "Ô͘", out: "Ô͘" }          // Capital POJ o-dot
       ];
 
       testCases.forEach(t => {
