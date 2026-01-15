@@ -4,11 +4,8 @@
 $timestamp = Get-Date -Format "yyyyMMdd_HHmm"
 $zipName = "packed/extension_$timestamp.zip"
 $tempDir = "dist_temp"
-$stableLink = "packed/extension.zip"
 
 # 1. Clean up previous build
-# We don't delete old timestamped zips to keep history, but we clean the stable link
-if (Test-Path $stableLink) { Remove-Item $stableLink }
 if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
 
 # 2. Create temp directory
@@ -69,9 +66,5 @@ Compress-Archive -Path "$tempDir/*" -DestinationPath $zipName
 # 7. Cleanup Temp
 Remove-Item $tempDir -Recurse -Force
 
-# 8. Create Stable Link Copy
-Copy-Item $zipName -Destination $stableLink
-
 Write-Host "Done! Created $zipName" -ForegroundColor Green
-Write-Host "Also updated stable link: $stableLink" -ForegroundColor Gray
 Write-Host "You can now upload $zipName to the Chrome Web Store." -ForegroundColor Gray
