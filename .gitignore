@@ -61,7 +61,8 @@ logs/
 # Project Directories
 # fonts/ should be tracked for the extension and website to work
 # images/ should be tracked for the extension and website
-working/
-#!working/tl_poj_converter.html
+working/*
+!working/tl_poj_converter_simple.html
+!working/tl_poj_converter.html
 
 #.agent/

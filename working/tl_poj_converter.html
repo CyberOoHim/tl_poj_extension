@@ -1,0 +1,2849 @@
+---
+layout: apps
+title: TL to POJ Real-time Converter
+version: v0.2f
+permalink: /pages/tl_poj_converter.html
+updated: 2026-01-12
+note: 1. enhance POJ text Preservation
+---
+<!DOCTYPE html>
+<!--
+  Copyright (c) 2026 Cyber O͘-hîm ki-tē
+  Licensed under the MIT License: https://opensource.org/licenses/MIT
+-->
+<!-- Note: 1. This is a real-time TL -> POJ converter. -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TL to POJ Real-time Converter</title>
+    <!-- Google Fonts: Huninn will be loaded dynamically with specific characters -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <style>
+        /* CSS Variables - From Image Resizer (Tech Theme) */
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --text-link: #58a6ff;
+            --text-accent: #238636;
+            --border-color: #30363d;
+            --font-mono: 'Times New Roman', serif;
+            --font-sans: 'Times New Roman', serif;
+            --font-taigi: 'Huninn', 'Times New Roman', serif;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 2rem;
+            --spacing-lg: 4rem;
+            --primary-color: var(--text-link);
+            /* Mapping for backward compatibility if needed */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            padding: var(--spacing-md);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 0;
+        }
+
+        h1 {
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            margin-bottom: 0;
+            color: var(--text-primary);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: 0;
+            justify-content: center;
+        }
+
+
+
+        .tab-btn:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: var(--bg-tertiary);
+            /* Active state */
+            color: var(--text-link);
+            border-color: var(--text-link);
+        }
+
+        /* Panels */
+        .panel {
+            display: none;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: var(--spacing-sm);
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        /* Real-time Mode Styles */
+        .split-view {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+            height: 600px;
+        }
+
+        @media (max-width: 768px) {
+            .split-view {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        /* Handset Vertical Optimization */
+        @media (max-width: 480px) {
+            body {
+                padding: var(--spacing-sm);
+                /* Reduce body padding */
+            }
+
+            .container {
+                gap: 0.25rem;
+                /* Tighter vertical gaps */
+            }
+
+            h1 {
+                font-size: 1.1rem;
+                /* Slightly smaller title */
+            }
+
+            .tab-btn {
+                padding: 0.5rem 1rem;
+                /* Smaller tabs */
+                font-size: 1rem;
+            }
+
+            .toolbar {
+                flex-wrap: wrap;
+                /* Allow toolbar items to wrap if needed */
+                gap: 0.5rem;
+            }
+
+            .toolbar label {
+                font-size: 1rem;
+            }
+
+            textarea {
+                font-size: 1.2rem;
+                /* Slightly smaller text for mobile readability */
+                padding: 0.75rem;
+            }
+        }
+
+        .text-area-container {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            height: 100%;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xs);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: var(--spacing-xs);
+        }
+
+        .toolbar label {
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .tool-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 4px 8px;
+            padding: 4px 8px;
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--text-primary);
+        }
+
+        textarea {
+            flex: 1;
+            padding: var(--spacing-sm);
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            resize: none;
+            font-family: var(--font-taigi);
+            /* Huninn for Taigi, Times New Roman fallback */
+            font-size: 1.4rem;
+            line-height: 1.6;
+            outline: none;
+            width: 100%;
+            color: var(--text-primary);
+            box-sizing: border-box;
+            min-height: 200px;
+        }
+
+        textarea:focus {
+            border-color: var(--text-link);
+            box-shadow: 0 0 0 1px var(--text-link);
+        }
+
+        /* Brighten placeholders */
+        textarea::placeholder,
+        input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.8;
+            font-size: 1.2rem;
+        }
+
+        /* File Mode Styles */
+        .file-drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 6px;
+            padding: var(--spacing-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(22, 27, 34, 0.5);
+            /* Semi-transparent like upload area */
+            margin-bottom: var(--spacing-md);
+        }
+
+        .file-drop-zone:hover,
+        .file-drop-zone.drag-over {
+            border-color: var(--text-link);
+            background: rgba(88, 166, 255, 0.05);
+        }
+
+        .file-drop-zone p {
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 1.4rem;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background-color: var(--text-accent);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: #2ea043;
+            box-shadow: 0 0 10px rgba(46, 160, 67, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #outputPreview {
+            width: 100%;
+            height: 400px;
+        }
+
+        /* Expander Styles */
+        details {
+            margin-bottom: 0.5rem;
+        }
+
+        details summary {
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            user-select: none;
+            color: var(--text-primary);
+        }
+
+        /* Options Panel */
+        .options-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .options-panel label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-family: var(--font-mono);
+        }
+
+        .options-panel input[type="checkbox"],
+        .options-panel input[type="radio"] {
+            accent-color: var(--text-link);
+        }
+
+        /* Columns/Keys List */
+        .columns-list {
+            max-height: 150px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            border-radius: 4px;
+            background: var(--bg-primary);
+        }
+
+        /* Table Preview */
+        #csv-preview-table-container {
+            display: none;
+            flex: 1;
+            overflow: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            max-height: 400px;
+        }
+
+        #csv-preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+
+        #csv-preview-table th,
+        #csv-preview-table td {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        #csv-preview-table th {
+            background: var(--bg-tertiary);
+            position: sticky;
+            top: 0;
+        }
+
+        #csv-preview-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Warning Messages */
+        #preview-messages {
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Toggle Switch Styles */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .switch-input {
+            display: none;
+        }
+
+        .switch-label {
+            position: relative;
+            display: inline-block;
+            width: 34px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .switch-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            border-radius: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .switch-slider::before {
+            content: "";
+            position: absolute;
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .switch-input:checked+.switch-label .switch-slider {
+            background-color: var(--text-link);
+        }
+
+        .switch-input:checked+.switch-label .switch-slider::before {
+            transform: translateX(14px);
+        }
+
+        .switch-text {
+            user-select: none;
+            white-space: nowrap;
+            color: var(--text-primary);
+        }
+
+        /* Help Tab Specifics */
+        .tab-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            /* Changed to inline-flex for baseline alignment */
+            align-items: baseline;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        #ui-tab-help {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        #ui-tab-help svg {
+            display: block;
+            transform: translateY(3px);
+            /* Optical alignment with text baseline */
+        }
+
+        /* Help Content Styles */
+        .settings-section,
+        .help-section,
+        .about-section {
+            color: var(--text-primary);
+        }
+
+        .help-content h4 {
+            margin-top: 1rem;
+            color: var(--text-link);
+        }
+
+        .help-content p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        #msg-specific-warning {
+            color: #f0ad4e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1 id="ui-title"></h1>
+        </header>
+
+        <div class="tabs" style="justify-content: center; align-items: center;">
+            <button class="tab-btn active" onclick="switchMode('realtime')" id="ui-tab-realtime"></button>
+            <button class="tab-btn" onclick="switchMode('file')" id="ui-tab-file"></button>
+            <button class="tab-btn" onclick="switchMode('help')" id="ui-tab-help">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" width="72" height="24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <g transform="translate(28, 8)">
+                        <path
+                            d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </g>
+                    <line x1="55" y1="32" x2="65" y2="8" stroke-width="2.5" />
+                    <g transform="translate(68, 8)">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <path d="M12 17h.01" />
+                    </g>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Real-time Panel -->
+        <div id="panel-realtime" class="panel active">
+            <div class="split-view">
+                <div class="text-area-container">
+                    <div class="toolbar">
+                        <label for="rt-input" id="ui-label-input"></label>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <button class="tool-btn" onclick="pasteFromClipboard('rt-input')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                    </path>
+                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                </svg>
+                                <span id="ui-btn-paste"></span>
+                            </button>
+                            <button class="tool-btn" onclick="clearInput('rt-input')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                                <span id="ui-btn-clear"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="rt-input" placeholder="" spellcheck="false"></textarea>
+                    <button class="tool-btn" id="ui-btn-quick-test" onclick="injectTestText()"
+                        style="margin-top: var(--spacing-xs); align-self: center;"></button>
+                </div>
+                <div class="text-area-container">
+                    <div class="toolbar">
+                        <label for="rt-output" id="ui-label-output"></label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="tool-btn" onclick="copyToClipboard('rt-output', 'ui-btn-copy-rt')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <span id="ui-btn-copy-rt"></span>
+                            </button>
+                            <button class="tool-btn" onclick="downloadText('rt-output', 'poj_conversion.txt')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                <span id="ui-btn-download-rt"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="rt-output" readonly placeholder="" spellcheck="false"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Converter Panel -->
+        <div id="panel-file" class="panel">
+            <!-- File Upload Section -->
+            <details id="file-upload-expander" open>
+                <summary id="ui-file-upload-header" style="font-size: 1.2rem;"></summary>
+                <div class="file-drop-zone" id="dropZone">
+                    <p id="ui-drop-text"></p>
+                    <input type="file" id="fileInput" accept=".txt,.md,.srt,.vtt,.csv,.tsv,.json,.pdf"
+                        style="display: none;">
+                    <button class="btn" id="btn-choose-file"
+                        style="display: inline-flex; align-items: center; gap: 8px; margin-top: 0.5rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span id="ui-btn-choose-file"></span>
+                    </button>
+                </div>
+            </details>
+
+            <!-- CSV Options Section -->
+            <details id="csv-options-expander" style="display: none;">
+                <summary id="ui-csv-options-header"></summary>
+                <div class="options-panel">
+                    <label id="lbl-select-columns" style="font-weight: bold;"></label>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.25rem;">
+                        <button type="button" id="btn-csv-select-all" class="tool-btn"
+                            style="font-size: 0.75rem;"></button>
+                        <button type="button" id="btn-csv-deselect-all" class="tool-btn"
+                            style="font-size: 0.75rem;"></button>
+                    </div>
+                    <div id="csv-columns-list" class="columns-list"></div>
+
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label id="lbl-output-mode" style="font-weight: bold;"></label>
+                        <label><input type="radio" name="csv-mode" value="only" checked> <span
+                                class="csv-mode-only"></span></label>
+                        <label><input type="radio" name="csv-mode" value="original-plus"> <span
+                                class="csv-mode-original-plus"></span></label>
+                        <label><input type="radio" name="csv-mode" value="insert"> <span
+                                class="csv-mode-insert"></span></label>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <button id="btn-convert-csv" class="btn" style="flex: 1;"></button>
+                        <button id="btn-reset-csv" class="tool-btn"></button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- JSON Options Section -->
+            <details id="json-options-expander" style="display: none;">
+                <summary id="ui-json-options-header"></summary>
+                <div class="options-panel">
+                    <label id="lbl-select-keys" style="font-weight: bold;"></label>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.25rem;">
+                        <button type="button" id="btn-json-select-all" class="tool-btn"
+                            style="font-size: 0.75rem;"></button>
+                        <button type="button" id="btn-json-deselect-all" class="tool-btn"
+                            style="font-size: 0.75rem;"></button>
+                    </div>
+                    <div id="json-keys-list" class="columns-list" style="font-family: monospace; font-size: 0.85rem;">
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label id="lbl-json-output-mode" style="font-weight: bold;"></label>
+                        <label><input type="radio" name="json-mode" value="only" checked> <span
+                                class="json-mode-only"></span></label>
+                        <label><input type="radio" name="json-mode" value="original-plus"> <span
+                                class="json-mode-original-plus"></span></label>
+                        <label><input type="radio" name="json-mode" value="insert"> <span
+                                class="json-mode-insert"></span></label>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <button id="btn-convert-json" class="btn" style="flex: 1;"></button>
+                        <button id="btn-reset-json" class="tool-btn"></button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Subtitle Options Section -->
+            <details id="subtitle-options-expander" style="display: none;">
+                <summary id="ui-subtitle-options-header"></summary>
+                <div class="options-panel">
+                    <label id="lbl-select-lines" style="font-weight: bold;"></label>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label><input type="radio" name="subtitle-mode" value="all" checked> <span
+                                class="subtitle-mode-all"></span></label>
+                        <label><input type="radio" name="subtitle-mode" value="line1"> <span
+                                class="subtitle-mode-line1"></span></label>
+                        <label><input type="radio" name="subtitle-mode" value="line2"> <span
+                                class="subtitle-mode-line2"></span></label>
+                        <label><input type="radio" name="subtitle-mode" value="line3plus"> <span
+                                class="subtitle-mode-line3plus"></span></label>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <button id="btn-convert-subtitle" class="btn" style="flex: 1;"></button>
+                        <button id="btn-reset-subtitle" class="tool-btn"></button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Output Section -->
+            <div id="fileOutputSection" style="display: none;">
+                <div id="preview-messages">
+                    <span id="msg-general-warning"></span>
+                    <span id="msg-specific-warning" style="display: none;"></span>
+                </div>
+                <div class="toolbar">
+                    <label id="ui-label-result"></label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="tool-btn" id="btn-reset-file" title="Ap-ló͘ 新 ê 書類">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </button>
+                        <button class="tool-btn" id="btn-copy-file">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            <span id="ui-btn-copy-file"></span>
+                        </button>
+                        <button class="tool-btn" id="btn-download-file">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <span id="ui-btn-download-file"></span>
+                        </button>
+                    </div>
+                </div>
+                <textarea id="outputPreview" readonly placeholder=""></textarea>
+                <div id="csv-preview-table-container"></div>
+            </div>
+        </div>
+
+        <!-- Help & Settings Panel -->
+        <div id="panel-help" class="panel">
+            <div class="settings-section"
+                style="padding: 1rem 1rem 0.5rem 1rem; border-bottom: 1px solid var(--border-color);">
+                <h3 id="ui-header-settings" style="margin-top: 0; font-size: 1.1rem; color: var(--text-primary);">
+                    Settings</h3>
+                <div class="setting-item" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span id="ui-lbl-nasal-toggle"
+                        style="color: var(--text-primary); font-family: var(--font-mono);">Nasal Superscript</span>
+                    <div class="switch-container">
+                        <input type="checkbox" id="nasal-superscript-toggle" class="switch-input" checked>
+                        <label for="nasal-superscript-toggle" class="switch-label">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <span id="ui-lbl-tone6-toggle"
+                        style="color: var(--text-primary); font-family: var(--font-mono);">Tone 6</span>
+                    <div class="switch-container">
+                        <input type="checkbox" id="tone6-toggle" class="switch-input">
+                        <label for="tone6-toggle" class="switch-label">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <span id="ui-lbl-allcaps-toggle"
+                        style="color: var(--text-primary); font-family: var(--font-mono);">All
+                        Caps</span>
+                    <div class="switch-container">
+                        <input type="checkbox" id="all-caps-toggle" class="switch-input" checked>
+                        <label for="all-caps-toggle" class="switch-label">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item" style="margin-top: 1.5rem; text-align: center;">
+                    <button id="ui-btn-run-test" class="tool-btn" style="width: 100%; justify-content: center;">
+                        Run UI Test
+                    </button>
+                    <button id="ui-btn-reset-settings" class="tool-btn"
+                        style="width: 100%; justify-content: center; margin-top: 0.5rem; background-color: var(--border-color); color: var(--text-primary);">
+                        Reset to Default
+                    </button>
+                </div>
+            </div>
+
+            <div class="help-section" style="padding: 0.5rem 1rem 1rem 1rem;">
+                <h3 id="ui-header-help" style="font-size: 1.1rem; color: var(--text-primary); margin-bottom: 1rem;">Help
+                </h3>
+                <div class="help-content" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-primary);">
+                    <p id="help-general-warnings" style="margin-bottom: 1rem; color: #f0ad4e;"></p>
+                    <h4 id="help-title-1" style="margin-bottom: 0.5rem;">1. 拍隨轉 (Real-time Mode)</h4>
+                    <p id="help-text-1" style="margin-top: 0; margin-bottom: 1rem;">
+                        Input TL or POJ with numeric tones.<br>
+                        - Input box: Type/Paste text.<br>
+                        - Output box: View converted POJ.<br>
+                    </p>
+
+                    <h4 id="help-title-2" style="margin-bottom: 0.5rem;">2. 轉書類 (File Mode)</h4>
+                    <p id="help-text-2" style="margin-top: 0; margin-bottom: 1rem;">
+                        Convert files in bulk.<br>
+                        - Supported: .txt, .md, .srt, .vtt, .csv, .tsv, .json, .pdf<br>
+                        - Preview and download converted results.
+                    </p>
+
+                    <h4 id="help-title-3" style="margin-bottom: 0.5rem;">3. 設定 (Settings)</h4>
+                    <p id="help-text-3" style="margin-top: 0; margin-bottom: 1rem;">
+                        <!-- Content injected by JS -->
+                    </p>
+                </div>
+
+                <div class="about-section"
+                    style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <h4 id="ui-header-about" style="margin-bottom: 0.5rem;">About</h4>
+                    <p id="about-text" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0;">
+                        <!-- Injected -->
+                    </p>
+
+                    <h5 id="assets-title" style="margin-bottom: 0.25rem; font-size: 0.8rem; margin-top: 1rem;">Libraries
+                        & Assets</h5>
+                    <p id="assets-text" style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0;">
+                        <!-- Injected -->
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: var(--spacing-sm);">
+            <button class="tool-btn" id="ui-btn-download-offline" onclick="downloadCleanVersion()"
+                style="padding: 10px 20px; display: inline-flex; border-style: dashed;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span id="ui-btn-download-offline-text"></span>
+            </button>
+        </div>
+
+        <footer
+            style="text-align: center; margin-top: var(--spacing-md); color: var(--text-secondary); font-size: 0.9rem;">
+            <a href="https://cyberoohim.github.io/" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <p id="ui-footer" style="margin: 0; transition: opacity 0.2s;"></p>
+            </a>
+            <style>
+                footer a:hover p {
+                    opacity: 0.8;
+                    text-decoration: underline;
+                }
+            </style>
+        </footer>
+    </div>
+
+    <script>
+
+        const taigiCharsToLoad = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáàâāa̍éèêēe̍íìîīi̍óòôōo̍úùûūu̍ÁÀÂĀA̍ÉÈÊĒE̍ÍÌÎĪI̍ÓÒÔŌO̍ÚÙÛŪU̍o͘ó͘ò͘ô͘ō͘o̍͘O͘Ó͘Ò͘Ô͘Ō͘O̍͘aⁿeⁿiⁿoⁿuⁿo͘ⁿAⁿEⁿIⁿOⁿUⁿO̍͘ⁿáⁿàⁿâⁿāⁿa̍ⁿéⁿèⁿêⁿēe̍ⁿíⁿìⁿîⁿīi̍ⁿóⁿòⁿôⁿō͘ⁿo̍͘ⁿúⁿùⁿûⁿūⁿu̍ⁿó͘ⁿò͘ⁿô͘ⁿō͘ⁿo̍͘ⁿÁⁿÀⁿÂⁿĀⁿA̍ⁿÉⁿÈÊⁿĒⁿE̍ⁿÍÌÎĪI̍ⁿÓÒÔŌⁿO̍ⁿÚⁿÙⁿÛⁿŪⁿU̍ⁿÓ͘ⁿÒ͘ⁿÔ͘ⁿŌ͘ⁿO̍͘ⁿăĕĭŏŭŏ͘ĂĔĬŎŬŎ͘ḿm̀m̂m̄m̍m̆ḾM̀M̂M̄M̍M̆ńǹn̂n̄n̍n̆ŃǸN̂N̄N̍N̆-0123456789.,;:?!'\"()[]{}<>@#$%^&*_+=\\|/";
+
+        // Dynamically load Google Font "Huninn" with specific Taigi characters
+        (function loadHuninnFont() {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = `https://fonts.googleapis.com/css2?family=Huninn&display=swap&text=${encodeURIComponent(taigiCharsToLoad)}`;
+            document.head.appendChild(link);
+        })();
+
+        // --- UI Constants ---
+        const UI_STRINGS = {
+            title: "TL -> POJ 隨時轉",
+            tabs: {
+                realtime: "拍隨轉",
+                file: "轉書類"
+            },
+            labels: {
+                input: "TL / TL & POJ 帶數字調號",
+                output: "POJ 輸出",
+                result: "轉soah結果"
+            },
+            buttons: {
+                paste: "貼 TL",
+                copy: "kho͘--起來",
+                download: "Táng-ló͘",
+                chooseFile: "Ap-ló͘",
+                copied: "kho͘ 好--ah!",
+                quickTest: "看見本/快速測",
+                downloadOffline: "⬇ Táng-ló͘ App 家己電腦用",
+                clear: "總清",
+                cancel: "取消"
+            },
+            placeholders: {
+                input: `說明：
+1. 拍/貼 TL he̍k-chiá TL/POJ 標數字調號...(e.g. Tâi-uân，Tai5-uan5，ia̍h-sī Tai5-oan5). 
+2. 無 beh 轉 ê 文字 kā 用 \\[ ... ] 包--起來。
+3. 看見本 ia̍h-sī 快速測，chhi̍h 下跤 chhi̍h-liú。
+4. Táng-ló͘(download) 這支 App，上下跤有 chhi̍h-liú。
+5. 毋thang 拍 符號調號 POJ koh 落去轉，無保證結果。`,
+                output: "POJ 輸出...",
+                preview: "輸出會 tī chia..."
+            },
+            dropZone: {
+                main: "Kā 書類 拖來 chia, ia̍h-sī chhi̍h Ap-ló͘ 揀書類, .txt/.md/.srt/.vtt/.csv/.tsv/.json/.pdf lóng 會使。"
+            },
+            file: {
+                uploadHeader: "📁 Ap-ló͘ 書類",
+                previewLabel: "轉soah結果",
+                fileTypes: {
+                    csv: " (CSV 表格)",
+                    tsv: " (TSV 表格)",
+                    json: " (JSON 資料)",
+                    pdf: " (PDF 文件)",
+                    text: " (Text 文件)",
+                    md: " (Markdown 文件)",
+                    srt: " (SRT 字幕)",
+                    vtt: " (VTT 字幕)"
+                },
+                messages: {
+                    general: "* Ài 細膩，英文 a̍h-sī 其他外語 ê 羅馬字 kám 有誤轉。",
+                    pdf: "* 排版若走精--去，a̍h-sī 資料落勾，tō 另外 kā 資料 choâng 好勢才用純文字轉。"
+                }
+            },
+            csv: {
+
+                optionsHeader: "⚙️ CSV/TSV 設定",
+                selectColumns: "揀欲轉 ê 直逝:",
+                outputMode: "Output 模式:",
+                modeOnly: "kan-ta 轉好--ê",
+                modeOriginalPlus: "原直逝 + 轉好--ê",
+                modeInsert: "插 tī 原直逝後壁",
+                btnConvert: "開始轉 CSV"
+            },
+            json: {
+                optionsHeader: "⚙️ JSON 設定",
+                selectKeys: "揀欲轉 ê Key:",
+                outputMode: "Output 模式:",
+                modeOnly: "kan-ta 轉好--ê",
+                modeOriginalPlus: "原 Key + 轉好--ê",
+                modeInsert: "插 tī 原 Key 後壁",
+                btnConvert: "開始轉 JSON"
+            },
+            subtitle: {
+                optionsHeader: "⚙️ 字幕設定",
+                selectLines: "揀欲轉佗一逝:",
+                modeAll: "Lóng-chóng",
+                modeLine1: "kan-ta 頭逝",
+                modeLine2: "kan-ta 第 2 逝",
+                modeLine3Plus: "kan-ta 第 3 逝以後",
+                btnConvert: "開始轉字幕",
+                detectPrompt: "這份 .txt 看起來有字幕時標，kàm beh 用字幕模式轉？"
+            },
+
+            settings: {
+                tabName: "Help & Settings",
+                headerSettings: "設定 (Settings)",
+                headerHelp: "說明 (Help)",
+                headerAbout: "關於 (About)",
+                nasalLabel: '尾N→鼻化音"ⁿ"',
+                tone6Label: "第6調 (ǎ)",
+                allCapsLabel: "大寫模式 (ALL CAPS)",
+                btnRunTest: "看 TL->POJ ê 見本 a̍h-sī 測看覓",
+                btnReset: "恢復初設 (Reset Default)"
+            },
+            help: {
+                generalWarnings: `<b>注意:</b> Lán 會用得拍 台羅數字調號 kap 符號調號 TL a̍h-sī POJ 數字調號 lóng-chóng 會轉做 POJ 符號調號。<br>
+<b>注意:</b> 假使有其他外語拄á好部份 chham 台羅 相siâng，會誤轉。這是 lán ê 使用限制。用走脫語法 thang 避免，chhi̍h <strong>頂懸頭1粒</strong> chhi̍h-liú 看例。<br>`,
+                rtTitle: "1. 拍隨轉 (Real-time Mode)",
+                rtText: `簡單 ê TL 轉 POJ ke-si，支援符號調號 TL 和數字調號 POJ。<br>
+• <strong>輸入</strong>: Tiàm 頂懸框á拍字 (例: Tye5-uan5 / Tâi-uân)。<br>
+• <strong>輸出</strong>: 下跤框á會隨顯示轉好 ê POJ。<br>`,
+                fileTitle: "2. 書類處理 (File Mode)",
+                fileText: `轉資料檔案。<br>
+• <strong>Ap-ló͘(Upload)</strong>: Kā 檔案 giú--入來，a̍h-sī chhi̍h chhi̍h-liú-á 去 檔案窗á掠。<br>
+• <strong>格式</strong>: 支援 .txt, .md, .srt/.vtt (字幕), .csv/.tsv (表格), .json, .pdf。<br>
+• <strong>Táng-ló͘(Download)</strong>: 轉好 ê 檔案會tàng táng-ló͘(download)khiām--起來。<br><br>
+<strong>轉書類設定:</strong><br>
+• <strong>CSV/TSV</strong>: 揀欲轉 ê 直逝(column)，會tàng揀 output 模式 (kan-ta 轉好--ê/原+轉/插--入去原表格)。<br>
+• <strong>JSON</strong>: 揀欲轉 ê key，會tàng揀 output 模式 (kan-ta 轉好--ê/原+轉/插--入去原JSON)。<br>
+• <strong>SRT/VTT</strong>: 若字幕有濟逝，會tàng揀欲轉佗一逝 (Lóng-chóng/頭逝/第2逝/第3+)。<br>
+  • <strong>注意</strong>: iPad 掠無 .srt，改做 .vtt a̍h-sī .txt。<br>
+  • <strong>注意</strong>: PDF 排版複雜 ê 讀了可能無好勢。<br>`,
+                settingsTitle: "3. 設定 (Settings)",
+                settingsText: `三粒開關 (Toggle)：<br>
+• <strong>尾N→ⁿ</strong>: ON=N轉ⁿ (saN→saⁿ)，OFF=N袂變 (saN→saN)。nn 一定轉。<br>
+• <strong>第6調 ǎ</strong>: ON=用 caron (ǎ)，OFF=用 acute (á) 親像第2調。<br>
+• <strong>大寫模式</strong>: ON=大寫 mā 轉 (TSUI→CHUI)，OFF=大寫袂變。<br><br>
+• <strong>看 TL->POJ ê 見本 a̍h-sī 測看覓</strong>: Chhi̍h 這粒chhi̍h鈕，會自動掠測試例文去「拍字轉」分頁，內底有各種 TL 轉 POJ ê 例，會使參考各種用法，koh 設定是 án-chóaⁿ 用。<br>
+• <strong>恢復初設 (Reset Default)</strong>: Kā 設定 lóng-chóng 恢復做原底 ê 預設。`
+            },
+            about: {
+                title: "About",
+                text: `TL -> POJ 隨時轉 Converter<br>
+Copyright © 2026 <a href="https://cyberoohim.github.io/" target="_blank" style="color: inherit; text-decoration: underline;">Cyber O͘-hîm ki-tē</a><br>
+Licensed under MIT License`,
+                assetsTitle: "Libraries & Assets",
+                assetsText: `<strong>PDF.js</strong> (Mozilla Foundation)<br>
+Licensed under Apache License 2.0<br><br>
+<strong>Readability.js</strong> (Mozilla Foundation)<br>
+Licensed under Apache License 2.0<br><br>
+<strong>Turndown.js</strong> (Dom Christie)<br>
+Licensed under MIT License<br><br>
+<strong>Huninn</strong> (justfont)<br>
+Licensed under SIL Open Font License 1.1<br><br>
+<strong>Chiayi City Font</strong> (Chiayi City Gov)<br>
+Licensed under SIL Open Font License 1.1`
+            },
+            selectionButtons: {
+                selectAll: "總揀",
+                deselectAll: "總清"
+            },
+            tooltips: {
+                resetFile: "Ap-ló͘ 新 ê 書類"
+            },
+            footer: "© 2026 Cyber O͘-hîm ki-tē",
+            messages: {
+                clipboardError: "無法度自動貼，chhi̍h Ctrl+V 貼看覓。",
+                truncated: "\n\n...\n\n----------\n\n↑ 先看--一下爾，完整--ê ài táng-ló͘...",
+                downloadConfirm: "Kám 有確定 beh táng-ló͘ tī 家己電腦用？",
+                fileTypeError: "書類格式無支援。Ài ap-ló͘： ",
+                selectColumnsError: "上無揀一逝直逝來轉。",
+                selectKeysError: "上無揀一个 Key 來轉。",
+                selectSubtitleLinesError: "上無揀一逝來轉。",
+                pdfParseError: "PDF 有重耽，讀無： ",
+                jsonParseError: "JSON 有重耽，讀無： ",
+                downloadFailed: "Táng-ló͘ 失敗。koh 試看覓。",
+                downloading: "Tng teh táng-ló͘ ..."
+            },
+            testSample: `=== TL 符號調輸入 (Diacritics) ===
+Tâi-uân sī chi̍t-ê hó só͘-chāi. (台灣是一个好所在)
+Tsit-chân tāi-tsì tsin-tsiànn hó. (這層代誌真正好)
+POJ 帶符號調號無 koh 轉: Góa ài lim tê, i ài chia̍h pn̄g. (我愛啉茶，伊愛食飯)
+
+=== TL/POJ 數字調輸入 (Numeric) ===
+Tai5-uan5 si7 chit8-e5 ho2 so2-chai7.
+Goa2 ai3 lim te5, i ai3 chiah8 png7.
+
+=== 調號 1-9 (Tones) ===
+a1 a2 a3 ah4 a5 a6 a7 ah8 a9
+A1 A2 A3 AH4 A5 A6 A7 AH8 A9
+e1 e2 e3 eh4 e5 e6 e7 eh8 e9
+o1 o2 o3 oh4 o5 o6 o7 oh8 o9
+
+=== TL→POJ 音素轉換 (Phonemes) ===
+\\[ts\\]: tsuí (水), tsit (這)
+\\[tsh\\]: tshut (出), tshài (菜)
+\\[oo\\]: oo (烏), hōo (予)
+j: jī (字), jia̍t (熱) (無變)
+
+\\[=== 鼻音 (nn / N) ===
+[尾N→ⁿ Toggle(切)]
+nn尾 (一定 lóng 轉): sann→saⁿ (三), sinn→siⁿ (生)
+N尾 ON: saN→saⁿ, siN→siⁿ, a̍hN→a̍hⁿ
+N尾 OFF: saN→saN, siN→siN, a̍hN→a̍hN\\]
+(頭前 ê nn / N 袂變: nng → nng, NG → NG)
+
+\\[=== 第六調 (Tone 6) ===
+[第6調 ǎ Toggle(切)]
+ON (Caron): a6→ǎ, e6→ě, o6→ǒ, ng6→ňg
+OFF (Acute): a6→á, e6→é, o6→ó, ng6→ńg\\]
+
+\\[=== 大寫 (ALL CAPS) ===
+[大寫模式 Toggle(切)]
+ON: TSUI→CHUI, TSHUT→CHHUT, OO→O͘
+OFF: TSUI→TSUI, TSHUT→TSHUT, OO→OO (無轉)\\]
+
+\\[=== 調位標記 (Vowel Priority) ===
+ua→oa: tuà→tòa (大), kuà→kòa (掛)
+ue→oe: kué→kóe (粿), pué→póe (飛)
+ui: suí→súi (水), kuí→kúi (鬼)\\]
+
+=== 走脫語法 (Escape Syntax) ===
+基本: \\[Tâi-uân\\] → Tâi-uân (原文保留)
+濟逝: \\[Thâu tsuā
+Jī tsuā\\] ← Hāⁿ 逝 mā lóng 袂轉
+
+相套 (Nested):
+\\[khí-thâu \\[ tē-jī\\] ← thâu-ê \\] 就收煞
+\\[(結果: "khí-thâu \\[ tē-jī" + 落尾照常轉)\\]
+
+英文: \\[Google\\] vs Google, \\[Boots\\] vs Boots
+     \\["I read a book about blue cats."\\] vs "I read a book about blue cats."
+URL: \\["https://example.com/page?id=tsing_tsha"\\] vs "https://example.com/page?id=tsing_tsha"
+
+=== 邊墘狀況 (Other Cases) ===
+混合: 123 !@# $100 (tsu-pún) {tsuí}
+月眉: (tsia̍h pn̄g) [tsia̍h pn̄g] {tsia̍h pn̄g}
+引句點: "tsuí" 'tsuí' 「tsuí」『tsuí』
+Han-jī 相濫: 台灣 Tâi-uân 是 sī 好 hó 所在 só͘-chāi
+頭尾空白:"   tsuí   "(空白無變)
+Ài 有連字符: \\[Tâiuânlâng, tsabóogíná\\] → Tâiuânlâng, tsabóogíná (無連字符無保證著)
+數字調號相濫: Goa2 ài 啉 tê, 伊 ai3 食 png7.
+
+=== POJ 保留 (POJ Preservation) ===
+POJ 鼻化「ⁿ」: chiâⁿ→chiâⁿ, siaⁿ→siaⁿ, koaⁿ→koaⁿ (袂變做 Tailo nn)
+POJ O͘點「o͘」: hó͘→hó͘, gô͘→gô͘, o͘→o͘ (袂變做 Tailo oo)
+混合輸入: chiâⁿ tsuí → chiâⁿ chúi (POJ 保留, TL 照常轉)
+混合輸入: hó͘ oo → hó͘ o͘ (POJ o͘ 保留, TL oo 轉做 POJ)
+大寫 POJ: Chiâⁿ→Chiâⁿ, Ô͘→Ô͘ (大寫 POJ mā 袂變)`
+        };
+        function initUI() {
+            document.getElementById('ui-title').innerText = UI_STRINGS.title;
+
+            // Icons for tabs
+            const iconRealtime = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`;
+            const iconFile = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>`;
+
+            document.getElementById('ui-tab-realtime').innerHTML = `${iconRealtime} <span>${UI_STRINGS.tabs.realtime}</span>`;
+            document.getElementById('ui-tab-file').innerHTML = `${iconFile} <span>${UI_STRINGS.tabs.file}</span>`;
+
+            document.getElementById('ui-label-input').innerText = UI_STRINGS.labels.input;
+            document.getElementById('ui-label-output').innerText = UI_STRINGS.labels.output;
+            document.getElementById('ui-label-result').innerText = UI_STRINGS.labels.result;
+
+            document.getElementById('ui-btn-paste').innerText = UI_STRINGS.buttons.paste;
+            document.getElementById('ui-btn-copy-rt').innerText = UI_STRINGS.buttons.copy;
+            document.getElementById('ui-btn-download-rt').innerText = UI_STRINGS.buttons.download;
+            document.getElementById('ui-btn-copy-file').innerText = UI_STRINGS.buttons.copy;
+            document.getElementById('ui-btn-download-file').innerText = UI_STRINGS.buttons.download;
+            document.getElementById('ui-btn-choose-file').innerText = UI_STRINGS.buttons.chooseFile;
+            document.getElementById('ui-btn-quick-test').innerText = UI_STRINGS.buttons.quickTest;
+            document.getElementById('ui-btn-download-offline-text').innerText = UI_STRINGS.buttons.downloadOffline;
+            document.getElementById('ui-btn-clear').innerText = UI_STRINGS.buttons.clear;
+            document.getElementById('ui-footer').innerText = UI_STRINGS.footer;
+
+            // Help & Settings
+            document.getElementById('ui-header-settings').innerText = UI_STRINGS.settings.headerSettings;
+            document.getElementById('ui-lbl-nasal-toggle').innerText = UI_STRINGS.settings.nasalLabel;
+            document.getElementById('ui-lbl-tone6-toggle').innerText = UI_STRINGS.settings.tone6Label;
+            document.getElementById('ui-lbl-allcaps-toggle').innerText = UI_STRINGS.settings.allCapsLabel;
+            document.getElementById('ui-btn-run-test').innerText = UI_STRINGS.settings.btnRunTest;
+            document.getElementById('ui-btn-reset-settings').innerText = UI_STRINGS.settings.btnReset;
+            document.getElementById('ui-header-help').innerText = UI_STRINGS.settings.headerHelp;
+            document.getElementById('ui-header-about').innerText = UI_STRINGS.settings.headerAbout;
+
+            // Help Content
+            document.getElementById('help-general-warnings').innerHTML = UI_STRINGS.help.generalWarnings;
+            document.getElementById('help-title-1').innerText = UI_STRINGS.help.rtTitle;
+            document.getElementById('help-text-1').innerHTML = UI_STRINGS.help.rtText;
+            document.getElementById('help-title-2').innerText = UI_STRINGS.help.fileTitle;
+            document.getElementById('help-text-2').innerHTML = UI_STRINGS.help.fileText;
+            document.getElementById('help-title-3').innerText = UI_STRINGS.help.settingsTitle;
+            document.getElementById('help-text-3').innerHTML = UI_STRINGS.help.settingsText;
+
+            // About Content
+            document.getElementById('ui-header-about').innerText = UI_STRINGS.about.title;
+            document.getElementById('about-text').innerHTML = UI_STRINGS.about.text;
+            document.getElementById('assets-title').innerText = UI_STRINGS.about.assetsTitle;
+            document.getElementById('assets-text').innerHTML = UI_STRINGS.about.assetsText;
+
+            document.getElementById('ui-drop-text').innerText = UI_STRINGS.dropZone.main;
+
+            document.getElementById('rt-input').placeholder = UI_STRINGS.placeholders.input;
+            document.getElementById('rt-output').placeholder = UI_STRINGS.placeholders.output;
+            document.getElementById('outputPreview').placeholder = UI_STRINGS.placeholders.preview;
+
+            // File upload header
+            document.getElementById('ui-file-upload-header').innerText = UI_STRINGS.file.uploadHeader;
+            document.getElementById('msg-general-warning').innerText = UI_STRINGS.file.messages.general;
+
+            // CSV Options
+            document.getElementById('ui-csv-options-header').innerText = UI_STRINGS.csv.optionsHeader;
+            document.getElementById('lbl-select-columns').innerText = UI_STRINGS.csv.selectColumns;
+            document.getElementById('lbl-output-mode').innerText = UI_STRINGS.csv.outputMode;
+            document.querySelector('.csv-mode-only').innerText = UI_STRINGS.csv.modeOnly;
+            document.querySelector('.csv-mode-original-plus').innerText = UI_STRINGS.csv.modeOriginalPlus;
+            document.querySelector('.csv-mode-insert').innerText = UI_STRINGS.csv.modeInsert;
+            document.getElementById('btn-convert-csv').innerText = UI_STRINGS.csv.btnConvert;
+            document.getElementById('btn-reset-csv').innerText = UI_STRINGS.buttons.cancel;
+
+            // JSON Options
+            document.getElementById('ui-json-options-header').innerText = UI_STRINGS.json.optionsHeader;
+            document.getElementById('lbl-select-keys').innerText = UI_STRINGS.json.selectKeys;
+            document.getElementById('lbl-json-output-mode').innerText = UI_STRINGS.json.outputMode;
+            document.querySelector('.json-mode-only').innerText = UI_STRINGS.json.modeOnly;
+            document.querySelector('.json-mode-original-plus').innerText = UI_STRINGS.json.modeOriginalPlus;
+            document.querySelector('.json-mode-insert').innerText = UI_STRINGS.json.modeInsert;
+            document.getElementById('btn-convert-json').innerText = UI_STRINGS.json.btnConvert;
+            document.getElementById('btn-reset-json').innerText = UI_STRINGS.buttons.cancel;
+
+            // Subtitle Options
+            document.getElementById('ui-subtitle-options-header').innerText = UI_STRINGS.subtitle.optionsHeader;
+            document.getElementById('lbl-select-lines').innerText = UI_STRINGS.subtitle.selectLines;
+            document.querySelector('.subtitle-mode-all').innerText = UI_STRINGS.subtitle.modeAll;
+            document.querySelector('.subtitle-mode-line1').innerText = UI_STRINGS.subtitle.modeLine1;
+            document.querySelector('.subtitle-mode-line2').innerText = UI_STRINGS.subtitle.modeLine2;
+            document.querySelector('.subtitle-mode-line3plus').innerText = UI_STRINGS.subtitle.modeLine3Plus;
+            document.getElementById('btn-convert-subtitle').innerText = UI_STRINGS.subtitle.btnConvert;
+            document.getElementById('btn-reset-subtitle').innerText = UI_STRINGS.buttons.cancel;
+
+            // Select All / Deselect All buttons
+            document.getElementById('btn-csv-select-all').innerText = UI_STRINGS.selectionButtons.selectAll;
+            document.getElementById('btn-csv-deselect-all').innerText = UI_STRINGS.selectionButtons.deselectAll;
+            document.getElementById('btn-json-select-all').innerText = UI_STRINGS.selectionButtons.selectAll;
+            document.getElementById('btn-json-deselect-all').innerText = UI_STRINGS.selectionButtons.deselectAll;
+
+            // Tooltips
+            document.getElementById('btn-reset-file').title = UI_STRINGS.tooltips.resetFile;
+        }
+
+        document.addEventListener('DOMContentLoaded', initUI);
+
+        // --- Nasal Superscript Toggle (N → ⁿ) ---
+        window.TL_USE_NASAL_SUPERSCRIPT = true; // Default ON
+        document.getElementById('nasal-superscript-toggle')?.addEventListener('change', (e) => {
+            window.TL_USE_NASAL_SUPERSCRIPT = e.target.checked;
+            triggerReconversion();
+        });
+
+        // --- Tone 6 Caron Flag (default OFF = use acute like tone 2) ---
+        window.TL_TONE6_USE_CARON = false; // Set to true for caron (ǎ) instead of acute (á)
+        const tone6Toggle = document.getElementById('tone6-toggle');
+        if (tone6Toggle) {
+            tone6Toggle.checked = window.TL_TONE6_USE_CARON;
+            tone6Toggle.addEventListener('change', (e) => {
+                window.TL_TONE6_USE_CARON = e.target.checked;
+                triggerReconversion();
+            });
+        }
+
+        // --- All-Caps Support Flag (default OFF) ---
+        window.TL_ALL_CAPS_SUPPORT = true; // Set to true to enable all-caps conversion (OO→O͘, TS→CH, etc.)
+        const allCapsToggle = document.getElementById('all-caps-toggle');
+        if (allCapsToggle) {
+            allCapsToggle.checked = window.TL_ALL_CAPS_SUPPORT;
+            allCapsToggle.addEventListener('change', (e) => {
+                window.TL_ALL_CAPS_SUPPORT = e.target.checked;
+                triggerReconversion();
+            });
+        }
+
+        function triggerReconversion() {
+            const rtInput = document.getElementById('rt-input');
+            if (rtInput && rtInput.value) {
+                document.getElementById('rt-output').value = TLtiau_2_POJtiau(rtInput.value);
+            }
+        }
+
+        // --- Run UI Test Button ---
+        document.getElementById('ui-btn-run-test')?.addEventListener('click', () => {
+            const rtInput = document.getElementById('rt-input');
+            if (rtInput) {
+                rtInput.value = UI_STRINGS.testSample;
+                switchMode('realtime');
+                rtInput.dispatchEvent(new Event('input')); // Trigger conversion
+            }
+        });
+
+        // --- Reset Settings Button ---
+        document.getElementById('ui-btn-reset-settings')?.addEventListener('click', () => {
+            // Apply Defaults
+            window.TL_USE_NASAL_SUPERSCRIPT = true;
+            window.TL_TONE6_USE_CARON = false;
+            window.TL_ALL_CAPS_SUPPORT = true;
+
+            // Update Toggles
+            const nasalToggle = document.getElementById('nasal-superscript-toggle');
+            if (nasalToggle) nasalToggle.checked = true;
+
+            const tone6Toggle = document.getElementById('tone6-toggle');
+            if (tone6Toggle) tone6Toggle.checked = false;
+
+            const allCapsToggle = document.getElementById('all-caps-toggle');
+            if (allCapsToggle) allCapsToggle.checked = true;
+
+            // Trigger Reconversion
+            triggerReconversion();
+        });
+
+        // --- CSV/JSON Select All / Deselect All ---
+        document.getElementById('btn-csv-select-all')?.addEventListener('click', () => {
+            document.getElementById('csv-columns-list')?.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+        });
+        document.getElementById('btn-csv-deselect-all')?.addEventListener('click', () => {
+            document.getElementById('csv-columns-list')?.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        });
+        document.getElementById('btn-json-select-all')?.addEventListener('click', () => {
+            document.getElementById('json-keys-list')?.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+        });
+        document.getElementById('btn-json-deselect-all')?.addEventListener('click', () => {
+            document.getElementById('json-keys-list')?.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        });
+
+        // --- Converter Logic (Ported from Python) ---
+
+        // Constants for regex tails
+        // TL_bue: Syllable endings used for tone mark positioning
+        // Updated to include p,t,k,h (entering tone endings) to allow non-standard tone/syllable combinations (e.g., ík -> ék)
+        const TL_bue = '((?:rm|rng|rn|r|m|ng|n|nnh|nn|ⁿ|N)?)';
+
+        // Helper to escape regex special characters in a string
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Helper to create replacement regex from TL vowel + optional trailing consonants
+        // Matches the Python RC_ function: vowel + optional tail chars
+        function createRC(char) {
+            // Matches vowel followed by optional consonant-like chars (for tone number placement)
+            return new RegExp(char + '([aAeEgGhHiIkKmMnNoOpPtTuU]*)', 'g');
+        }
+
+        // Helper for RC1 (tailo[:-1] + TL_bue + tailo[-1])
+        function createRC1(tailo) {
+            const prefix = tailo.slice(0, -1);
+            const lastChar = tailo.slice(-1);
+            return new RegExp(prefix + TL_bue + lastChar, 'g');
+        }
+
+        // Helper for RC2 (tailo[0] + '(u|i)((?:N|ⁿ|nn)?)' + tailo[1])
+        function createRC2(tailo) {
+            return new RegExp(tailo[0] + '(u|i)((?:N|ⁿ|nn)?)' + tailo[1], 'g');
+        }
+
+        // Helper for RC3 (simple)
+        function createRC3(tailo) {
+            // Python regexes had re.A (ASCII only) but here we trust the input range or JS regex default
+            // We ensure we match exact sequences. 
+            // Note: Python's re.sub matches literal strings if not regex. 
+            // But here we are building regexes. 
+            return new RegExp(tailo, 'g');
+        }
+
+        function createRC3_Regex(pattern) {
+            return new RegExp(pattern, 'g');
+        }
+
+        // Helper for RC4
+        function createRC4(tailo) {
+            const prefix = tailo.slice(0, -1);
+            const lastChar = tailo.slice(-1);
+            return new RegExp(prefix + '(h(?:N|ⁿ|nn)?|H(?:N|ⁿ|nn)?|p|P|t|T|k|K)' + lastChar + '?', 'g');
+        }
+
+        // Helper for RC8
+        function createRC8(tailo) {
+            const prefix = tailo.slice(0, -1);
+            const lastChar = tailo.slice(-1);
+            return new RegExp(prefix + '(h(?:N|ⁿ|nn)?|H(?:N|ⁿ|nn)?|p|P|t|T|k|K)' + lastChar, 'g');
+        }
+
+        // 1. TL Tone Marks -> TL Numbers
+        function TLtiau_2_TLsoo(tl_tiau, nasal = 'nn', use14 = false) {
+            let tl_soo = tl_tiau;
+            if (!tl_soo) return '';
+
+            // Mapping table (regex, replacement string)
+            // Note: In JS replacement string, $1 refers to capture group 1.
+
+            const TL_T2S = [
+                { r: createRC('á'), s: 'a$12' }, { r: createRC('Á'), s: 'A$12' },
+                { r: createRC('à'), s: 'a$13' }, { r: createRC('À'), s: 'A$13' },
+                { r: createRC('â'), s: 'a$15' }, { r: createRC('Â'), s: 'A$15' },
+                { r: createRC('ǎ'), s: 'a$16' }, { r: createRC('Ǎ'), s: 'A$16' },
+                { r: createRC('ā'), s: 'a$17' }, { r: createRC('Ā'), s: 'A$17' },
+                { r: createRC('a̍'), s: 'a$18' }, { r: createRC('A̍'), s: 'A$18' },
+                { r: createRC('a̋'), s: 'a$19' }, { r: createRC('A̋'), s: 'A$19' },
+                { r: createRC('é'), s: 'e$12' }, { r: createRC('É'), s: 'E$12' },
+                { r: createRC('è'), s: 'e$13' }, { r: createRC('È'), s: 'E$13' },
+                { r: createRC('ê'), s: 'e$15' }, { r: createRC('Ê'), s: 'E$15' },
+                { r: createRC('ě'), s: 'e$16' }, { r: createRC('Ě'), s: 'E$16' },
+                { r: createRC('ē'), s: 'e$17' }, { r: createRC('Ē'), s: 'E$17' },
+                { r: createRC('e̍'), s: 'e$18' }, { r: createRC('E̍'), s: 'E$18' },
+                { r: createRC('e̋'), s: 'e$19' }, { r: createRC('E̋'), s: 'E$19' },
+                { r: createRC('í'), s: 'i$12' }, { r: createRC('Í'), s: 'I$12' },
+                { r: createRC('ì'), s: 'i$13' }, { r: createRC('Ì'), s: 'I$13' },
+                { r: createRC('î'), s: 'i$15' }, { r: createRC('Î'), s: 'I$15' },
+                { r: createRC('ǐ'), s: 'i$16' }, { r: createRC('Ǐ'), s: 'I$16' },
+                { r: createRC('ī'), s: 'i$17' }, { r: createRC('Ī'), s: 'I$17' },
+                { r: createRC('i̍'), s: 'i$18' }, { r: createRC('I̍'), s: 'I$18' },
+                { r: createRC('i̋'), s: 'i$19' }, { r: createRC('I̋'), s: 'I$19' },
+                // oo chars - specific casing
+                { r: createRC('ó͘'), s: 'oo$12' }, { r: createRC('Ó͘'), s: 'Oo$12' },
+                { r: createRC('ò͘'), s: 'oo$13' }, { r: createRC('Ò͘'), s: 'Oo$13' },
+                { r: createRC('ô͘'), s: 'oo$15' }, { r: createRC('Ô͘'), s: 'Oo$15' },
+                { r: createRC('ǒ͘'), s: 'oo$16' }, { r: createRC('Ǒ͘'), s: 'Oo$16' },
+                { r: createRC('ō͘'), s: 'oo$17' }, { r: createRC('Ō͘'), s: 'Oo$17' },
+                { r: createRC('o̍͘'), s: 'oo$18' }, { r: createRC('O̍͘'), s: 'Oo$18' },
+                { r: createRC('ő͘'), s: 'oo$19' }, { r: createRC('Ő͘'), s: 'Oo$19' },
+                // straight o
+                { r: createRC('ó'), s: 'o$12' }, { r: createRC('Ó'), s: 'O$12' },
+                { r: createRC('ò'), s: 'o$13' }, { r: createRC('Ò'), s: 'O$13' },
+                { r: createRC('ô'), s: 'o$15' }, { r: createRC('Ô'), s: 'O$15' },
+                { r: createRC('ǒ'), s: 'o$16' }, { r: createRC('Ǒ'), s: 'O$16' },
+                { r: createRC('ō'), s: 'o$17' }, { r: createRC('Ō'), s: 'O$17' },
+                { r: createRC('o̍'), s: 'o$18' }, { r: createRC('O̍'), s: 'O$18' },
+                { r: createRC('ő'), s: 'o$19' }, { r: createRC('Ő'), s: 'O$19' },
+                // u
+                { r: createRC('ú'), s: 'u$12' }, { r: createRC('Ú'), s: 'U$12' },
+                { r: createRC('ù'), s: 'u$13' }, { r: createRC('Ù'), s: 'U$13' },
+                { r: createRC('û'), s: 'u$15' }, { r: createRC('Û'), s: 'U$15' },
+                { r: createRC('ǔ'), s: 'u$16' }, { r: createRC('Ǔ'), s: 'U$16' },
+                { r: createRC('ū'), s: 'u$17' }, { r: createRC('Ū'), s: 'U$17' },
+                { r: createRC('u̍'), s: 'u$18' }, { r: createRC('U̍'), s: 'U$18' },
+                { r: createRC('ű'), s: 'u$19' }, { r: createRC('Ű'), s: 'U$19' },
+                // m
+                { r: createRC('ḿ'), s: 'm$12' }, { r: createRC('Ḿ'), s: 'M$12' },
+                { r: createRC('m̀'), s: 'm$13' }, { r: createRC('M̀'), s: 'M$13' },
+                { r: createRC('m̂'), s: 'm$15' }, { r: createRC('M̂'), s: 'M$15' },
+                { r: createRC('m̌'), s: 'm$16' }, { r: createRC('M̌'), s: 'M$16' },
+                { r: createRC('m̄'), s: 'm$17' }, { r: createRC('M̄'), s: 'M$17' },
+                { r: createRC('m̍'), s: 'm$18' }, { r: createRC('M̍'), s: 'M$18' },
+                { r: createRC('m̋'), s: 'm$19' }, { r: createRC('M̋'), s: 'M$19' },
+                // n
+                { r: createRC('ń'), s: 'n$12' }, { r: createRC('Ń'), s: 'N$12' },
+                { r: createRC('ǹ'), s: 'n$13' }, { r: createRC('Ǹ'), s: 'N$13' },
+                { r: createRC('n̂'), s: 'n$15' }, { r: createRC('N̂'), s: 'N$15' },
+                { r: createRC('ň'), s: 'n$16' }, { r: createRC('N̋'), s: 'N$16' },
+                { r: createRC('n̄'), s: 'n$17' }, { r: createRC('N̄'), s: 'N$17' },
+                { r: createRC('n̍'), s: 'n$18' }, { r: createRC('N̍'), s: 'N$18' },
+                { r: createRC('n̋'), s: 'n$19' }, { r: createRC('N̋'), s: 'N$19' }
+            ];
+
+            for (const map of TL_T2S) {
+                tl_soo = tl_soo.replace(map.r, map.s);
+            }
+
+            // Handle plain o͘ (no tone mark) -> oo. Must come after toned o͘ conversions.
+            tl_soo = tl_soo.replace(/o͘/g, 'oo');
+            tl_soo = tl_soo.replace(/O͘/g, 'Oo');
+
+            tl_soo = tl_soo.replace(/ⁿ/g, 'nn');
+
+            if (nasal === 'N') {
+                tl_soo = tl_soo.replace(/(?<=[aeiouAEIOU])nn/g, 'N'); // Lookbehind support in modern JS
+            }
+
+            if (use14) {
+                const add1 = /(a|A|e|E|i|I|o|O|u|U|m|M|ng|Ng|n)\b/g;
+                const add4 = /(h|H|p|P|t|T|k|K)\b/g;
+                tl_soo = tl_soo.replace(add1, '$11');
+                tl_soo = tl_soo.replace(add4, '$14');
+            }
+
+            return tl_soo;
+        }
+
+        // 2. TL Numbers -> POJ Numbers
+        function TLsoo_2_POJsoo(tailo_soo, keep14 = false) {
+            if (!tailo_soo) return '';
+
+            let poj_soo = tailo_soo;
+
+            if (!keep14) {
+                const remove1 = /([aeiouAEIOU](?:nn|N)?|[aeiouAEIOU](?:ng|n|m)|(?:p|P|ph|Ph|m|M|b|B|t|T|th|Th|n|N|l|L|k|K|kh|Kh|ng|Ng|g|G|s|S|h|H)?(?:ng|Ng|m|M))1/g;
+                poj_soo = poj_soo.replace(remove1, '$1');
+
+                const remove4 = /([aeiouAEIOU](?:(?:nn|N)?(?:h|H)|p|P|t|T|k|K)|(?:m|M|ng|Ng)(?:h|H))4/g;
+                poj_soo = poj_soo.replace(remove4, '$1');
+            }
+
+            // String replacements
+            const tailo2poj = [
+                ['oonn', 'o͘N'], ['Oonn', 'O͘N'],
+                ['onn', 'o͘N'], ['Onn', 'O͘N'],
+                ['ts', 'ch'], ['Ts', 'Ch'],
+                ['oo', 'o͘'], ['Oo', 'O͘'],
+                ['ua', 'oa'], ['Ua', 'Oa'], ['ue', 'oe'], ['Ue', 'Oe'],
+                ['ing', 'eng'], ['Ing', 'Eng'], ['ik', 'ek'], ['Ik', 'Ek'],
+                // nnh → hnn (will always convert to hⁿ via nn rule)
+                // Nh is NOT converted here - handled in POJsoo_2_POJtiau (toggle-dependent)
+                ['nnh', 'hnn']
+            ];
+            // Add all-caps variants if flag enabled
+            if (window.TL_ALL_CAPS_SUPPORT) {
+                tailo2poj.push(
+                    ['OONN', 'O͘N'], ['ONN', 'O͘N'],
+                    ['TS', 'CH'], ['OO', 'O͘'],
+                    ['UA', 'OA'], ['UE', 'OE'],
+                    ['ING', 'ENG'], ['IK', 'EK'],
+                    ['NNH', 'HNN']
+                );
+            }
+
+            for (const [k, v] of tailo2poj) {
+                poj_soo = poj_soo.replace(new RegExp(k, 'g'), v); // Use regex for global replace
+            }
+
+            // Only normalize N patterns, don't convert nn to N here
+            // nn will be handled in POJsoo_2_POJtiau (always converts to ⁿ)
+            // N will be handled in POJsoo_2_POJtiau (toggle-dependent)
+
+            return poj_soo;
+        }
+
+        // 3. POJ Numbers -> POJ Tone Marks
+        function POJsoo_2_POJtiau(poj_soo) {
+            if (!poj_soo) return '';
+            let poj_tiau = poj_soo;
+
+            // Nasal superscript conversion:
+            // - nn at syllable tail (after vowel or vowel+h or m+h): ALWAYS convert to ⁿ
+            // - N at syllable tail (after vowel or vowel+h or m+h): Only convert when toggle is ON
+            // - Standalone nn/N (not after valid pattern): Preserve as-is
+            // Patterns: vowel+nn, vowel+h+nn, m+h+nn (and same for N)
+            const nn_to_superscript = /([aeiouAEIOUmM]h?|[aeiouAEIOU])nn(\d?)\b/g;
+            poj_tiau = poj_tiau.replace(nn_to_superscript, '$1ⁿ$2');
+
+            const useNasalSuperscript = typeof window !== 'undefined' &&
+                window.TL_USE_NASAL_SUPERSCRIPT !== false;
+            if (useNasalSuperscript) {
+                const N_to_superscript = /([aeiouAEIOUmM]h?|[aeiouAEIOU])N(\d?)\b/g;
+                poj_tiau = poj_tiau.replace(N_to_superscript, '$1ⁿ$2');
+                // Also handle Nh pattern (reorder and convert): aNh → ahⁿ
+                const Nh_to_superscript = /([aeiouAEIOUmM])Nh?(\d?)\b/g;
+                poj_tiau = poj_tiau.replace(Nh_to_superscript, '$1hⁿ$2');
+            }
+
+            // Tone 6 character selection: caron (ǎ) or acute (á) like tone 2
+            // Default is false = use acute (same as tone 2)
+            const useTone6Caron = typeof window !== 'undefined' &&
+                window.TL_TONE6_USE_CARON === true;
+            const t6 = useTone6Caron
+                ? { a: 'ǎ', A: 'Ǎ', e: 'ě', E: 'Ě', i: 'ǐ', I: 'Ǐ', o: 'ǒ', O: 'Ǒ', u: 'ǔ', U: 'Ǔ', 'o͘': 'ǒ͘', 'O͘': 'Ǒ͘', m: 'm̌', M: 'M̌', n: 'ň', N: 'Ň' }
+                : { a: 'á', A: 'Á', e: 'é', E: 'É', i: 'í', I: 'Í', o: 'ó', O: 'Ó', u: 'ú', U: 'Ú', 'o͘': 'ó͘', 'O͘': 'Ó͘', m: 'ḿ', M: 'Ḿ', n: 'ń', N: 'Ń' };
+
+            // Mapping
+            const POJ_S2T = [
+                // use RC2
+                { r: createRC2('a1'), s: 'a$1$2' }, { r: createRC2('A1'), s: 'A$1$2' },
+                { r: createRC2('a2'), s: 'á$1$2' }, { r: createRC2('A2'), s: 'Á$1$2' },
+                { r: createRC2('a3'), s: 'à$1$2' }, { r: createRC2('A3'), s: 'À$1$2' },
+                // use RC3
+                { r: createRC3_Regex('a(i|u)((?:N|ⁿ|nn)?)h4'), s: 'a$1$2h' },
+                { r: createRC3_Regex('A(i|u)((?:N|ⁿ|nn)?)h4'), s: 'A$1$2h' },
+                // use RC2
+                { r: createRC2('a5'), s: 'â$1$2' }, { r: createRC2('A5'), s: 'Â$1$2' },
+                { r: createRC2('a6'), s: t6.a + '$1$2' }, { r: createRC2('A6'), s: t6.A + '$1$2' },
+                { r: createRC2('a7'), s: 'ā$1$2' }, { r: createRC2('A7'), s: 'Ā$1$2' },
+                // use RC3
+                { r: createRC3_Regex('a(i|u)h(?:N|ⁿ|nn)8'), s: 'a̍$1hⁿ' },
+                { r: createRC3_Regex('A(i|u)h(?:N|ⁿ|nn)8'), s: 'A̍$1hⁿ' },
+                { r: createRC3_Regex('a(i|u)h8'), s: 'a̍$1h' },
+                { r: createRC3_Regex('A(i|u)h8'), s: 'A̍$1h' },
+                // use RC2
+                { r: createRC2('a9'), s: 'ă$1$2' }, { r: createRC2('A9'), s: 'Ă$1$2' },
+
+                // use RC2
+                { r: createRC2('u1'), s: 'u$1$2' }, { r: createRC2('U1'), s: 'U$1$2' },
+                { r: createRC2('u2'), s: 'ú$1$2' }, { r: createRC2('U2'), s: 'Ú$1$2' },
+                { r: createRC2('u3'), s: 'ù$1$2' }, { r: createRC2('U3'), s: 'Ù$1$2' },
+                // use RC3
+                { r: createRC3_Regex('uih((?:N|ⁿ|nn)?)4'), s: 'uih$1' },
+                { r: createRC3_Regex('Uih((?:N|ⁿ|nn)?)4'), s: 'Uih$1' },
+                // use RC2
+                { r: createRC2('u5'), s: 'û$1$2' }, { r: createRC2('U5'), s: 'Û$1$2' },
+                { r: createRC2('u6'), s: t6.u + '$1$2' }, { r: createRC2('U6'), s: t6.U + '$1$2' },
+                { r: createRC2('u7'), s: 'ū$1$2' }, { r: createRC2('U7'), s: 'Ū$1$2' },
+                // use RC3
+                { r: createRC3_Regex('uih((?:N|ⁿ|nn)?)8'), s: 'u̍ih$1' },
+                { r: createRC3_Regex('Uih((?:N|ⁿ|nn)?)8'), s: 'U̍ih$1' },
+                // use RC2
+                { r: createRC2('u9'), s: 'ŭ$1$2' }, { r: createRC2('U9'), s: 'Ŭ$1$2' },
+
+                // use RC3 - Complex O/o handling (oa, oe diphthongs)
+                { r: createRC3_Regex('(o|O)([ae])((?:N|ⁿ|nn)?)1?\\b'), s: '$1$2$3' },
+                { r: createRC3_Regex('o([ae])((?:N|ⁿ|nn)?)2\\b'), s: 'ó$1$2' },
+                { r: createRC3_Regex('O([ae])((?:N|ⁿ|nn)?)2\\b'), s: 'Ó$1$2' },
+                { r: createRC3_Regex('o([ae])((?:N|ⁿ|nn)?)3\\b'), s: 'ò$1$2' },
+                { r: createRC3_Regex('O([ae])((?:N|ⁿ|nn)?)3\\b'), s: 'Ò$1$2' },
+                { r: createRC3_Regex('o([ae])((?:N|ⁿ|nn)?)5\\b'), s: 'ô$1$2' },
+                { r: createRC3_Regex('O([ae])((?:N|ⁿ|nn)?)5\\b'), s: 'Ô$1$2' },
+                { r: createRC3_Regex('o([ae])((?:N|ⁿ|nn)?)6\\b'), s: t6.o + '$1$2' },
+                { r: createRC3_Regex('O([ae])((?:N|ⁿ|nn)?)6\\b'), s: t6.O + '$1$2' },
+                { r: createRC3_Regex('o([ae])((?:N|ⁿ|nn)?)7\\b'), s: 'ō$1$2' },
+                { r: createRC3_Regex('O([ae])((?:N|ⁿ|nn)?)7\\b'), s: 'Ō$1$2' },
+                { r: createRC3_Regex('o([ae])((?:N|ⁿ|nn)?)9\\b'), s: 'ŏ$1$2' },
+                { r: createRC3_Regex('O([ae])((?:N|ⁿ|nn)?)9\\b'), s: 'Ŏ$1$2' },
+
+                // use RC1
+                { r: createRC1('a1'), s: 'a$1' }, { r: createRC1('A1'), s: 'A$1' },
+                { r: createRC1('a2'), s: 'á$1' }, { r: createRC1('A2'), s: 'Á$1' },
+                { r: createRC1('a3'), s: 'à$1' }, { r: createRC1('A3'), s: 'À$1' },
+                { r: createRC4('a4'), s: 'a$1' }, { r: createRC4('A4'), s: 'A$1' },
+                { r: createRC1('a5'), s: 'â$1' }, { r: createRC1('A5'), s: 'Â$1' },
+                { r: createRC1('a6'), s: t6.a + '$1' }, { r: createRC1('A6'), s: t6.A + '$1' },
+                { r: createRC1('a7'), s: 'ā$1' }, { r: createRC1('A7'), s: 'Ā$1' },
+                { r: createRC8('a8'), s: 'a̍$1' }, { r: createRC8('A8'), s: 'A̍$1' },
+                { r: createRC1('a9'), s: 'ă$1' }, { r: createRC1('A9'), s: 'Ă$1' },
+
+                { r: createRC1('e1'), s: 'e$1' }, { r: createRC1('E1'), s: 'E$1' },
+                { r: createRC1('e2'), s: 'é$1' }, { r: createRC1('E2'), s: 'É$1' },
+                { r: createRC1('e3'), s: 'è$1' }, { r: createRC1('E3'), s: 'È$1' },
+                { r: createRC4('e4'), s: 'e$1' }, { r: createRC4('E4'), s: 'E$1' },
+                { r: createRC1('e5'), s: 'ê$1' }, { r: createRC1('E5'), s: 'Ê$1' },
+                { r: createRC1('e6'), s: t6.e + '$1' }, { r: createRC1('E6'), s: t6.E + '$1' },
+                { r: createRC1('e7'), s: 'ē$1' }, { r: createRC1('E7'), s: 'Ē$1' },
+                { r: createRC8('e8'), s: 'e̍$1' }, { r: createRC8('E8'), s: 'E̍$1' },
+                { r: createRC1('e9'), s: 'ĕ$1' }, { r: createRC1('E9'), s: 'Ĕ$1' },
+
+                { r: createRC1('i1'), s: 'i$1' }, { r: createRC1('I1'), s: 'I$1' },
+                { r: createRC1('i2'), s: 'í$1' }, { r: createRC1('I2'), s: 'Í$1' },
+                { r: createRC1('i3'), s: 'ì$1' }, { r: createRC1('I3'), s: 'Ì$1' },
+                { r: createRC4('i4'), s: 'i$1' }, { r: createRC4('I4'), s: 'I$1' },
+                { r: createRC1('i5'), s: 'î$1' }, { r: createRC1('I5'), s: 'Î$1' },
+                { r: createRC1('i6'), s: t6.i + '$1' }, { r: createRC1('I6'), s: t6.I + '$1' },
+                { r: createRC1('i7'), s: 'ī$1' }, { r: createRC1('I7'), s: 'Ī$1' },
+                { r: createRC8('i8'), s: 'i̍$1' }, { r: createRC8('I8'), s: 'I̍$1' },
+                { r: createRC1('i9'), s: 'ĭ$1' }, { r: createRC1('I9'), s: 'Ĭ$1' },
+
+                // o͘ handling
+                { r: createRC1('o͘1'), s: 'o͘$1' }, { r: createRC1('O͘1'), s: 'O͘$1' },
+                { r: createRC1('o͘2'), s: 'ó͘$1' }, { r: createRC1('O͘2'), s: 'Ó͘$1' },
+                { r: createRC1('o͘3'), s: 'ò͘$1' }, { r: createRC1('O͘3'), s: 'Ò͘$1' },
+                { r: createRC4('o͘4'), s: 'o͘$1' }, { r: createRC4('O͘4'), s: 'O͘$1' },
+                { r: createRC1('o͘5'), s: 'ô͘$1' }, { r: createRC1('O͘5'), s: 'Ô͘$1' },
+                { r: createRC1('o͘6'), s: t6['o͘'] + '$1' }, { r: createRC1('O͘6'), s: t6['O͘'] + '$1' },
+                { r: createRC1('o͘7'), s: 'ō͘$1' }, { r: createRC1('O͘7'), s: 'Ō͘$1' },
+                { r: createRC8('o͘8'), s: 'o̍͘$1' }, { r: createRC8('O͘8'), s: 'O̍͘$1' },
+                { r: createRC1('o͘9'), s: 'ŏ͘$1' }, { r: createRC1('O͘9'), s: 'Ŏ͘$1' },
+
+                { r: createRC1('o1'), s: 'o$1' }, { r: createRC1('O1'), s: 'O$1' },
+                { r: createRC1('o2'), s: 'ó$1' }, { r: createRC1('O2'), s: 'Ó$1' },
+                { r: createRC1('o3'), s: 'ò$1' }, { r: createRC1('O3'), s: 'Ò$1' },
+                { r: createRC4('o4'), s: 'o$1' }, { r: createRC4('O4'), s: 'O$1' },
+                { r: createRC1('o5'), s: 'ô$1' }, { r: createRC1('O5'), s: 'Ô$1' },
+                { r: createRC1('o6'), s: t6.o + '$1' }, { r: createRC1('O6'), s: t6.O + '$1' },
+                { r: createRC1('o7'), s: 'ō$1' }, { r: createRC1('O7'), s: 'Ō$1' },
+                { r: createRC8('o8'), s: 'o̍$1' }, { r: createRC8('O8'), s: 'O̍$1' },
+                { r: createRC1('o9'), s: 'ŏ$1' }, { r: createRC1('O9'), s: 'Ŏ$1' },
+
+                { r: createRC1('u1'), s: 'u$1' }, { r: createRC1('U1'), s: 'U$1' },
+                { r: createRC1('u2'), s: 'ú$1' }, { r: createRC1('U2'), s: 'Ú$1' },
+                { r: createRC1('u3'), s: 'ù$1' }, { r: createRC1('U3'), s: 'Ù$1' },
+                { r: createRC4('u4'), s: 'u$1' }, { r: createRC4('U4'), s: 'U$1' },
+                { r: createRC1('u5'), s: 'û$1' }, { r: createRC1('U5'), s: 'Û$1' },
+                { r: createRC1('u6'), s: t6.u + '$1' }, { r: createRC1('U6'), s: t6.U + '$1' },
+                { r: createRC1('u7'), s: 'ū$1' }, { r: createRC1('U7'), s: 'Ū$1' },
+                { r: createRC8('u8'), s: 'u̍$1' }, { r: createRC8('U8'), s: 'U̍$1' },
+                { r: createRC1('u9'), s: 'ŭ$1' }, { r: createRC1('U9'), s: 'Ŭ$1' },
+
+                // use RC3 mappings
+                { r: createRC3_Regex('m1'), s: 'm' }, { r: createRC3_Regex('M1'), s: 'M' },
+                { r: createRC3_Regex('m2'), s: 'ḿ' }, { r: createRC3_Regex('M2'), s: 'Ḿ' },
+                { r: createRC3_Regex('m3'), s: 'm̀' }, { r: createRC3_Regex('M3'), s: 'M̀' },
+                { r: createRC3_Regex('mh4'), s: 'mh' }, { r: createRC3_Regex('Mh4'), s: 'Mh' },
+                { r: createRC3_Regex('m5'), s: 'm̂' }, { r: createRC3_Regex('M5'), s: 'M̂' },
+                { r: createRC3_Regex('m6'), s: t6.m }, { r: createRC3_Regex('M6'), s: t6.M },
+                { r: createRC3_Regex('m7'), s: 'm̄' }, { r: createRC3_Regex('M7'), s: 'M̄' },
+                { r: createRC3_Regex('mh8'), s: 'm̍h' }, { r: createRC3_Regex('Mh8'), s: 'M̍h' },
+                { r: createRC3_Regex('m9'), s: 'm̆' }, { r: createRC3_Regex('M9'), s: 'M̆' },
+
+                { r: createRC3_Regex('ng1'), s: 'ng' }, { r: createRC3_Regex('Ng1'), s: 'Ng' },
+                { r: createRC3_Regex('ng2'), s: 'ńg' }, { r: createRC3_Regex('Ng2'), s: 'Ńg' },
+                { r: createRC3_Regex('ng3'), s: 'ǹg' }, { r: createRC3_Regex('Ng3'), s: 'Ǹg' },
+                { r: createRC3_Regex('ngh4'), s: 'ngh' }, { r: createRC3_Regex('Ngh4'), s: 'Ngh' },
+                { r: createRC3_Regex('ng5'), s: 'n̂g' }, { r: createRC3_Regex('Ng5'), s: 'N̂g' },
+                { r: createRC3_Regex('ng6'), s: t6.n + 'g' }, { r: createRC3_Regex('Ng6'), s: t6.N + 'g' },
+                { r: createRC3_Regex('ng7'), s: 'n̄g' }, { r: createRC3_Regex('Ng7'), s: 'N̄g' },
+                { r: createRC3_Regex('ngh8'), s: 'n̍gh' }, { r: createRC3_Regex('Ngh8'), s: 'N̍gh' },
+                { r: createRC3_Regex('ng9'), s: 'n̆g' }, { r: createRC3_Regex('Ng9'), s: 'N̆g' }
+            ];
+            // Add all-caps NG rules if flag enabled
+            if (window.TL_ALL_CAPS_SUPPORT) {
+                POJ_S2T.push(
+                    { r: createRC3_Regex('NG1'), s: 'NG' },
+                    { r: createRC3_Regex('NG2'), s: t6.N + 'G' },
+                    { r: createRC3_Regex('NG3'), s: 'ǸG' },
+                    { r: createRC3_Regex('NGH4'), s: 'NGH' },
+                    { r: createRC3_Regex('NG5'), s: 'N̂G' },
+                    { r: createRC3_Regex('NG6'), s: t6.N + 'G' },
+                    { r: createRC3_Regex('NG7'), s: 'N̄G' },
+                    { r: createRC3_Regex('NGH8'), s: 'N̍GH' },
+                    { r: createRC3_Regex('NG9'), s: 'N̆G' }
+                );
+            }
+
+            for (const map of POJ_S2T) {
+                poj_tiau = poj_tiau.replace(map.r, map.s);
+            }
+
+            return poj_tiau;
+        }
+
+        function TLtiau_2_POJtiau(tl_tiau) {
+            // 0. Handle escape sequences: \[text\] is preserved as-is (supports multi-line)
+            // Uses O(n) state machine scan instead of regex for robustness
+            // Delimiter: \[ opens, \] closes (allows regular ] inside)
+            const escapes = [];
+            let processedInput = '';
+            let i = 0;
+            while (i < tl_tiau.length) {
+                if (tl_tiau[i] === '\\' && tl_tiau[i + 1] === '[') {
+                    // Found escape start \[
+                    let start = i + 2;
+                    let end = tl_tiau.indexOf('\\]', start);
+                    if (end === -1) {
+                        // No closing \] → escape everything to end of string
+                        escapes.push(tl_tiau.slice(start));
+                        processedInput += `⟪ESC${escapes.length - 1}⟫`;
+                        break;
+                    }
+                    // Found closing \]
+                    escapes.push(tl_tiau.slice(start, end));
+                    processedInput += `⟪ESC${escapes.length - 1}⟫`;
+                    i = end + 2; // Skip past \]
+                } else {
+                    processedInput += tl_tiau[i];
+                    i++;
+                }
+            }
+
+            // 0b. Preserve POJ text (syllables with POJ-specific markers)
+            // POJ-specific characters: ⁿ (superscript n), o͘/O͘ (o with dot above)
+            // Match words/syllables containing these POJ markers and preserve them
+            const pojPlaceholders = [];
+
+            // Pattern: match syllables ending with ⁿ
+            const pojNasalEndPattern = /[\p{L}\p{M}]+ⁿ/gu;
+            // Pattern: match syllables with o͘/O͘
+            const pojOoPattern = /[\p{L}\p{M}]*[oO]͘[\p{L}\p{M}]*/gu;
+
+            // First pass: preserve syllables with ⁿ
+            processedInput = processedInput.replace(pojNasalEndPattern, (match) => {
+                pojPlaceholders.push(match);
+                return `⟪POJ${pojPlaceholders.length - 1}⟫`;
+            });
+
+            // Second pass: preserve syllables with o͘/O͘ (that weren't already captured)
+            processedInput = processedInput.replace(pojOoPattern, (match) => {
+                // Skip if already a placeholder
+                if (match.includes('⟪POJ')) return match;
+                pojPlaceholders.push(match);
+                return `⟪POJ${pojPlaceholders.length - 1}⟫`;
+            });
+
+            // 1. Convert TL-style tone marks to corresponding numbers
+            const tl_soo = TLtiau_2_TLsoo(processedInput);
+            // 2. Convert TL number-style to POJ number-style
+            const poj_soo = TLsoo_2_POJsoo(tl_soo);
+            // 3. Convert POJ number-style to POJ tone marks
+            let poj_tiau = POJsoo_2_POJtiau(poj_soo);
+
+            // 4a. Restore escaped content
+            poj_tiau = poj_tiau.replace(/⟪ESC(\d+)⟫/g, (match, index) => {
+                return escapes[parseInt(index)];
+            });
+
+            // 4b. Restore POJ content (preserved syllables with POJ-specific markers)
+            poj_tiau = poj_tiau.replace(/⟪POJ(\d+)⟫/g, (match, index) => {
+                return pojPlaceholders[parseInt(index)];
+            });
+
+            return poj_tiau;
+        }
+
+        // --- UI Logic ---
+
+        function clearInput(id) {
+            const el = document.getElementById(id);
+            el.value = '';
+            el.dispatchEvent(new Event('input'));
+        }
+
+        async function downloadCleanVersion() {
+            if (!confirm(UI_STRINGS.messages.downloadConfirm)) {
+                return;
+            }
+
+            try {
+                const btn = document.getElementById('ui-btn-download-offline');
+                const originalText = btn.innerText;
+                btn.innerText = UI_STRINGS.messages.downloading;
+                btn.disabled = true;
+
+                const res = await fetch('https://raw.githubusercontent.com/CyberOoHim/CyberOoHim.github.io/main/pages/tl_poj_converter.html');
+                let text = await res.text();
+
+                // Strip Jekyll front matter (---...---) and the HTML comment after it
+                text = text.replace(/^---[\s\S]*?---\n/, '');
+                text = text.replace(/^< !--[\s\S ]*?- ->\n/, '');
+                text = text.trim();
+
+                const blob = new Blob([text], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'tl_poj_converter.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                btn.innerText = originalText;
+                btn.disabled = false;
+            } catch (err) {
+                alert(UI_STRINGS.messages.downloadFailed);
+            }
+        }
+
+        function injectTestText() {
+            const rtInput = document.getElementById('rt-input');
+            rtInput.value = UI_STRINGS.testSample;
+            rtInput.dispatchEvent(new Event('input'));
+        }
+
+        function switchMode(mode) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+
+            document.getElementById(`ui-tab-${mode}`).classList.add('active');
+            document.getElementById(`panel-${mode}`).classList.add('active');
+        }
+
+        // Real-time conversion
+        const rtInput = document.getElementById('rt-input');
+        const rtOutput = document.getElementById('rt-output');
+
+        rtInput.addEventListener('input', (e) => {
+            const text = e.target.value;
+            const converted = TLtiau_2_POJtiau(text);
+            rtOutput.value = converted;
+        });
+
+        // File conversion - State variables
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const outputPreview = document.getElementById('outputPreview');
+        const fileOutputSection = document.getElementById('fileOutputSection');
+        const btnChooseFile = document.getElementById('btn-choose-file');
+
+        let currentFileOutput = '';
+        let currentFileName = 'poj_output.txt';
+
+        // CSV State
+        let currentCsvData = null;
+        let currentCsvSeparator = ',';
+        const csvColumnsList = document.getElementById('csv-columns-list');
+
+        // JSON State
+        let currentJsonData = null;
+        let currentJsonRawContent = '';
+        let currentJsonPaths = [];
+        let currentJsonIsArray = false;
+
+        // Subtitle State
+        let currentSubtitleData = null;
+        let currentSubtitleRawContent = '';
+        let currentSubtitleExt = 'srt';
+
+        // Event Listeners
+        btnChooseFile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file) processFile(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) processFile(e.target.files[0]);
+        });
+
+        // Reset View
+        function resetFileView() {
+            const expander = document.getElementById('file-upload-expander');
+            if (expander) expander.open = true;
+            document.getElementById('csv-options-expander').style.display = 'none';
+            document.getElementById('json-options-expander').style.display = 'none';
+            document.getElementById('subtitle-options-expander').style.display = 'none';
+            fileOutputSection.style.display = 'none';
+            document.getElementById('csv-preview-table-container').style.display = 'none';
+            outputPreview.style.display = 'block';
+            currentCsvData = null;
+            currentJsonData = null;
+            currentJsonPaths = [];
+            currentSubtitleData = null;
+            fileInput.value = '';
+            currentFileOutput = '';
+        }
+
+        // Helper: Dynamically load a script
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        // Reset button handlers
+        document.getElementById('btn-reset-csv').addEventListener('click', resetFileView);
+        document.getElementById('btn-reset-json').addEventListener('click', resetFileView);
+        document.getElementById('btn-reset-subtitle').addEventListener('click', resetFileView);
+        document.getElementById('btn-reset-file').addEventListener('click', resetFileView);
+
+        // Copy/Download for file output
+        document.getElementById('btn-copy-file').addEventListener('click', async () => {
+            if (currentFileOutput) {
+                await navigator.clipboard.writeText(currentFileOutput);
+                const btn = document.getElementById('ui-btn-copy-file');
+                const original = btn.innerText;
+                btn.innerText = UI_STRINGS.buttons.copied;
+                setTimeout(() => btn.innerText = original, 2000);
+            }
+        });
+
+        document.getElementById('btn-download-file').addEventListener('click', () => {
+            if (currentFileOutput) {
+                downloadTextContent(currentFileOutput, currentFileName);
+            }
+        });
+
+        // Helper: Download text content
+        function downloadTextContent(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Helper: Update preview label with file type
+        function updatePreviewLabel(type) {
+            const label = document.getElementById('ui-label-result');
+            if (label && UI_STRINGS.file.fileTypes[type]) {
+                label.innerText = UI_STRINGS.file.previewLabel + UI_STRINGS.file.fileTypes[type];
+            } else if (label) {
+                label.innerText = UI_STRINGS.file.previewLabel + UI_STRINGS.file.fileTypes.text;
+            }
+
+            // Toggle specific messages
+            const msgSpecific = document.getElementById('msg-specific-warning');
+            if (msgSpecific) {
+                if (type === 'pdf') {
+                    msgSpecific.innerText = ' ' + UI_STRINGS.file.messages.pdf;
+                    msgSpecific.style.display = 'inline';
+                } else {
+                    msgSpecific.style.display = 'none';
+                }
+            }
+        }
+
+        // Parse CSV/TSV
+        function parseCSV(text, separator) {
+            const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+            if (lines.length === 0) return null;
+
+            const headers = lines[0].split(separator).map(h => h.trim());
+            const rows = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(separator);
+                if (values.length === headers.length) {
+                    const row = {};
+                    headers.forEach((h, index) => {
+                        row[h] = values[index];
+                    });
+                    rows.push(row);
+                }
+            }
+            return { headers, rows, rawLines: lines };
+        }
+
+        // Generate CSV
+        function generateCSV(headers, rows, separator) {
+            const headerLine = headers.join(separator);
+            const dataLines = rows.map(row => {
+                return headers.map(h => row[h] || '').join(separator);
+            }).join('\n');
+            return headerLine + '\n' + dataLines;
+        }
+
+        // Run tests on load if enabled
+        const ENABLE_SELF_TEST = false;
+        if (ENABLE_SELF_TEST) {
+            runTests();
+        }
+
+        // Render Table
+        function renderTable(headers, rows) {
+            const table = document.createElement('table');
+            table.id = 'csv-preview-table';
+
+            const thead = document.createElement('thead');
+            const trHead = document.createElement('tr');
+            headers.forEach(h => {
+                const th = document.createElement('th');
+                th.textContent = h;
+                trHead.appendChild(th);
+            });
+            thead.appendChild(trHead);
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            rows.slice(0, 100).forEach(row => {
+                const tr = document.createElement('tr');
+                headers.forEach(h => {
+                    const td = document.createElement('td');
+                    td.textContent = row[h];
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+
+            return table;
+        }
+
+        // Extract JSON Keys
+        function extractJsonKeys(obj) {
+            const keys = [];
+
+            if (Array.isArray(obj) && obj.length > 0 && typeof obj[0] === 'object' && obj[0] !== null) {
+                currentJsonIsArray = true;
+                const schemaKeys = Object.keys(obj[0]);
+                schemaKeys.forEach(key => {
+                    if (typeof obj[0][key] === 'string') {
+                        const count = obj.filter(item => typeof item[key] === 'string').length;
+                        keys.push({
+                            key: key,
+                            isArrayKey: true,
+                            sampleValue: obj[0][key],
+                            count: count
+                        });
+                    }
+                });
+            } else if (typeof obj === 'object' && obj !== null) {
+                currentJsonIsArray = false;
+                function traverse(current, path) {
+                    if (typeof current === 'string') {
+                        keys.push({
+                            key: path,
+                            isArrayKey: false,
+                            sampleValue: current,
+                            count: 1
+                        });
+                    } else if (Array.isArray(current)) {
+                        current.forEach((item, i) => {
+                            traverse(item, `${path}[${i}]`);
+                        });
+                    } else if (current !== null && typeof current === 'object') {
+                        Object.keys(current).forEach(k => {
+                            const newPath = path ? `${path}.${k}` : k;
+                            traverse(current[k], newPath);
+                        });
+                    }
+                }
+                traverse(obj, '');
+            }
+
+            return keys;
+        }
+
+        // Set nested value in object
+        function setNestedValue(obj, path, value) {
+            const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.');
+            let current = obj;
+            for (let i = 0; i < parts.length - 1; i++) {
+                const key = parts[i];
+                const nextKey = parts[i + 1];
+                if (!(key in current)) {
+                    current[key] = /^\d+$/.test(nextKey) ? [] : {};
+                }
+                current = current[key];
+            }
+            current[parts[parts.length - 1]] = value;
+        }
+
+        // Helper to detect timecode lines (both standard and bracket formats)
+        function isTimecode(line) {
+            if (!line) return false;
+            // Standard SRT/VTT: 00:00:00,000 --> 00:00:00,000
+            if (line.includes('-->')) return true;
+            // Bracket style: [00:00] or [00:00:00]
+            if (/^\s*\[\d{1,2}:\d{2}(?::\d{2})?\]/.test(line)) return true;
+            return false;
+        }
+
+        // Smart detection for subtitle format in .txt files
+        function detectSubtitleFormat(content) {
+            const lines = content.split(/\r?\n/).slice(0, 50);
+
+            // VTT header check
+            if (lines[0]?.trim().toUpperCase() === 'WEBVTT') return 'vtt';
+
+            // SRT/VTT timecode pattern
+            const srtTimecodePattern = /\d{1,2}:\d{2}(?::\d{2})?[,.:]\d{3}\s*-->/;
+            const bracketTimecodePattern = /^\s*\[\d{1,2}:\d{2}(?::\d{2})?\]/;
+
+            let bracketCount = 0;
+            for (const line of lines) {
+                if (srtTimecodePattern.test(line)) return 'srt';
+                if (bracketTimecodePattern.test(line)) bracketCount++;
+            }
+
+            if (bracketCount >= 3) return 'srt';
+            return null;
+        }
+
+        // Parse Subtitle (SRT/VTT) with bracket timecode and header support
+        function parseSubtitle(content, ext) {
+            const lines = content.split(/\r?\n/);
+            const blocks = [];
+            let i = 0;
+            const headerLines = { urlLines: [], titleBlock: null };
+
+            // Parse header section (before first timecode) for URL and TITLE
+            while (i < lines.length && !isTimecode(lines[i])) {
+                const line = lines[i].trim();
+                if (/^url:/i.test(line)) {
+                    headerLines.urlLines.push(lines[i]);
+                } else if (/^title:/i.test(line)) {
+                    const match = lines[i].match(/^(title:\s*)/i);
+                    const prefix = match ? match[1] : 'TITLE: ';
+                    const firstLineContent = lines[i].substring(prefix.length);
+                    const titleTextLines = [];
+                    if (firstLineContent.trim() !== '') {
+                        titleTextLines.push(firstLineContent);
+                    }
+                    i++;
+                    while (i < lines.length && lines[i].trim() !== '' && !isTimecode(lines[i])) {
+                        titleTextLines.push(lines[i]);
+                        i++;
+                    }
+                    headerLines.titleBlock = { prefix, textLines: titleTextLines };
+                    continue;
+                }
+                i++;
+            }
+
+            // Parse subtitle blocks
+            while (i < lines.length) {
+                while (i < lines.length && lines[i].trim() === '') i++;
+                if (i >= lines.length) break;
+
+                const block = { cueId: '', timestamp: '', textLines: [], rawLines: [] };
+
+                if (isTimecode(lines[i])) {
+                    block.timestamp = lines[i];
+                    block.rawLines.push(lines[i]);
+                    i++;
+                } else {
+                    block.cueId = lines[i];
+                    block.rawLines.push(lines[i]);
+                    i++;
+
+                    if (i < lines.length && isTimecode(lines[i])) {
+                        block.timestamp = lines[i];
+                        block.rawLines.push(lines[i]);
+                        i++;
+                    }
+                }
+
+                // Text lines until empty line or next timecode
+                while (i < lines.length && lines[i].trim() !== '' && !isTimecode(lines[i])) {
+                    const line = lines[i];
+                    block.rawLines.push(line);
+                    block.textLines.push({ text: line, isUrl: false });
+                    i++;
+                }
+
+                if (block.timestamp || block.textLines.length > 0) {
+                    blocks.push(block);
+                }
+            }
+
+            return { blocks, headerLines };
+        }
+
+        // Convert Subtitle based on mode
+        function convertSubtitle(parsed, mode) {
+            const resultLines = [];
+
+            // Add header lines first
+            // URL lines - preserved as-is
+            if (parsed.headerLines) {
+                parsed.headerLines.urlLines.forEach(line => {
+                    resultLines.push(line);
+                });
+
+                // TITLE block - apply same line selection rules as subtitle blocks
+                if (parsed.headerLines.titleBlock) {
+                    const titleBlock = parsed.headerLines.titleBlock;
+                    titleBlock.textLines.forEach((lineText, lineIndex) => {
+                        const lineNum = lineIndex + 1;
+                        let shouldConvert = false;
+
+                        if (mode === 'all') shouldConvert = true;
+                        else if (mode === 'line1' && lineNum === 1) shouldConvert = true;
+                        else if (mode === 'line2' && lineNum === 2) shouldConvert = true;
+                        else if (mode === 'line3plus' && lineNum >= 3) shouldConvert = true;
+
+                        const prefix = lineIndex === 0 ? titleBlock.prefix : '';
+                        if (shouldConvert) {
+                            resultLines.push(prefix + TLtiau_2_POJtiau(lineText));
+                        } else {
+                            resultLines.push(prefix + lineText);
+                        }
+                    });
+                }
+
+                // Add blank line after header if there were header lines
+                if (parsed.headerLines.urlLines.length > 0 || parsed.headerLines.titleBlock) {
+                    resultLines.push('');
+                }
+            }
+
+            parsed.blocks.forEach(block => {
+                if (block.cueId) resultLines.push(block.cueId);
+                resultLines.push(block.timestamp);
+
+                block.textLines.forEach((lineObj, lineIndex) => {
+                    const lineNum = lineIndex + 1;
+                    let shouldConvert = false;
+
+                    if (mode === 'all') shouldConvert = true;
+                    else if (mode === 'line1' && lineNum === 1) shouldConvert = true;
+                    else if (mode === 'line2' && lineNum === 2) shouldConvert = true;
+                    else if (mode === 'line3plus' && lineNum >= 3) shouldConvert = true;
+
+                    if (shouldConvert) {
+                        resultLines.push(TLtiau_2_POJtiau(lineObj.text));
+                    } else {
+                        resultLines.push(lineObj.text);
+                    }
+                });
+
+                resultLines.push('');
+            });
+
+            return resultLines.join('\n');
+        }
+
+        // Main File Processor
+        function processFile(file) {
+            const allowedExtensions = ['.txt', '.md', '.srt', '.vtt', '.csv', '.tsv', '.json', '.pdf'];
+            const fileName = file.name.toLowerCase();
+
+            const namePart = file.name.substring(0, file.name.lastIndexOf('.'));
+            let extPart = file.name.substring(file.name.lastIndexOf('.'));
+
+            // If PDF, change extension to .txt for the output file
+            if (extPart.toLowerCase() === '.pdf') {
+                extPart = '.txt';
+            }
+
+            currentFileName = `${namePart}_POJ${extPart}`;
+
+            const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
+            if (!isValid) {
+                alert(UI_STRINGS.messages.fileTypeError + allowedExtensions.join(', '));
+                return;
+            }
+
+            const isCsv = fileName.endsWith('.csv') || fileName.endsWith('.tsv');
+            const isPdf = fileName.endsWith('.pdf');
+            const separator = fileName.endsWith('.tsv') ? '\t' : ',';
+
+            // Handle PDF separately with ArrayBuffer reader
+            if (isPdf) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        // Dynamically load PDF.js if not already loaded
+                        if (typeof pdfjsLib === 'undefined') {
+                            await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+                            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                        }
+
+                        const pdf = await pdfjsLib.getDocument({ data: e.target.result }).promise;
+                        let fullText = '';
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            // Preserve newlines by checking hasEOL property on each text item
+                            // Also add spaces between items to prevent word concatenation
+                            let pageText = '';
+                            textContent.items.forEach((item, idx) => {
+                                pageText += item.str;
+                                if (item.hasEOL) {
+                                    pageText += '\n';
+                                } else if (idx < textContent.items.length - 1) {
+                                    pageText += ' ';
+                                }
+                            });
+                            fullText += pageText + '\n';
+                        }
+
+                        // Collapse upload expander
+                        document.getElementById('file-upload-expander').open = false;
+                        document.getElementById('csv-options-expander').style.display = 'none';
+                        document.getElementById('json-options-expander').style.display = 'none';
+                        document.getElementById('subtitle-options-expander').style.display = 'none';
+
+                        const converted = TLtiau_2_POJtiau(fullText);
+                        currentFileOutput = converted;
+                        updatePreviewLabel('pdf');
+                        document.getElementById('csv-preview-table-container').style.display = 'none';
+                        outputPreview.style.display = 'block';
+                        outputPreview.value = converted.slice(0, 2000) + (converted.length > 2000 ? UI_STRINGS.messages.truncated : '');
+                        fileOutputSection.style.display = 'block';
+                    } catch (error) {
+                        alert(UI_STRINGS.messages.pdfParseError + error.message);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+
+                // Collapse upload expander
+                document.getElementById('file-upload-expander').open = false;
+
+                if (isCsv) {
+                    // CSV/TSV Mode
+                    currentCsvSeparator = separator;
+                    const parsed = parseCSV(content, separator);
+                    if (parsed && parsed.headers.length > 0) {
+                        currentCsvData = parsed;
+
+                        updatePreviewLabel(fileName.endsWith('.tsv') ? 'tsv' : 'csv');
+
+                        document.getElementById('csv-options-expander').style.display = 'block';
+                        document.getElementById('csv-options-expander').open = true;
+                        document.getElementById('json-options-expander').style.display = 'none';
+                        document.getElementById('subtitle-options-expander').style.display = 'none';
+                        fileOutputSection.style.display = 'none';
+
+                        // Populate columns
+                        csvColumnsList.innerHTML = '';
+                        parsed.headers.forEach(header => {
+                            const div = document.createElement('div');
+                            div.style.display = 'flex';
+                            div.style.alignItems = 'center';
+                            div.style.gap = '0.5rem';
+
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.value = header;
+                            checkbox.id = `col-${header}`;
+
+                            const label = document.createElement('label');
+                            label.htmlFor = `col-${header}`;
+                            label.textContent = header;
+                            label.style.cursor = 'pointer';
+
+                            div.appendChild(checkbox);
+                            div.appendChild(label);
+                            csvColumnsList.appendChild(div);
+                        });
+                    }
+                } else if (fileName.endsWith('.json')) {
+                    // JSON Mode
+                    try {
+                        const jsonData = JSON.parse(content);
+                        currentJsonData = jsonData;
+                        currentJsonRawContent = content;
+
+                        updatePreviewLabel('json');
+
+                        document.getElementById('csv-options-expander').style.display = 'none';
+                        document.getElementById('json-options-expander').style.display = 'block';
+                        document.getElementById('json-options-expander').open = true;
+                        document.getElementById('subtitle-options-expander').style.display = 'none';
+                        fileOutputSection.style.display = 'none';
+
+                        const keys = extractJsonKeys(jsonData);
+                        currentJsonPaths = keys;
+
+                        const jsonKeysList = document.getElementById('json-keys-list');
+                        jsonKeysList.innerHTML = '';
+                        keys.forEach((keyInfo, index) => {
+                            const div = document.createElement('div');
+                            div.style.display = 'flex';
+                            div.style.alignItems = 'flex-start';
+                            div.style.gap = '0.5rem';
+
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.value = index;
+                            checkbox.id = `json-key-${index}`;
+
+                            const label = document.createElement('label');
+                            label.htmlFor = `json-key-${index}`;
+                            label.style.cursor = 'pointer';
+                            label.style.wordBreak = 'break-all';
+
+                            const preview = keyInfo.sampleValue.length > 25 ? keyInfo.sampleValue.slice(0, 25) + '...' : keyInfo.sampleValue;
+                            if (keyInfo.isArrayKey) {
+                                label.textContent = `${keyInfo.key} (×${keyInfo.count}): "${preview}"`;
+                            } else {
+                                label.textContent = `${keyInfo.key}: "${preview}"`;
+                            }
+
+                            div.appendChild(checkbox);
+                            div.appendChild(label);
+                            jsonKeysList.appendChild(div);
+                        });
+                    } catch (err) {
+                        alert(UI_STRINGS.messages.jsonParseError + err.message);
+                    }
+                } else if (fileName.endsWith('.srt') || fileName.endsWith('.vtt')) {
+                    // Subtitle Mode
+                    const ext = fileName.endsWith('.vtt') ? 'vtt' : 'srt';
+                    updatePreviewLabel(ext);
+
+                    const parsedSubtitle = parseSubtitle(content, ext);
+                    currentSubtitleData = parsedSubtitle;
+                    currentSubtitleRawContent = content;
+                    currentSubtitleExt = ext;
+
+                    const hasMultiLine = parsedSubtitle.blocks.some(b => b.textLines.length > 1);
+
+                    document.getElementById('csv-options-expander').style.display = 'none';
+                    document.getElementById('json-options-expander').style.display = 'none';
+
+                    if (hasMultiLine) {
+                        document.getElementById('subtitle-options-expander').style.display = 'block';
+                        document.getElementById('subtitle-options-expander').open = true;
+                        fileOutputSection.style.display = 'none';
+                    } else {
+                        document.getElementById('subtitle-options-expander').style.display = 'none';
+                        const converted = convertSubtitle(parsedSubtitle, 'all');
+                        currentFileOutput = converted;
+                        document.getElementById('csv-preview-table-container').style.display = 'none';
+                        outputPreview.style.display = 'block';
+                        outputPreview.value = converted.slice(0, 2000) + (converted.length > 2000 ? UI_STRINGS.messages.truncated : '');
+                        fileOutputSection.style.display = 'block';
+                    }
+                } else {
+                    // Standard Mode (txt, md) - with smart subtitle detection for .txt
+                    const ext = fileName.substring(fileName.lastIndexOf('.') + 1);
+
+                    // Smart detect subtitle format in .txt files
+                    if (ext === 'txt') {
+                        const detectedFormat = detectSubtitleFormat(content);
+                        if (detectedFormat) {
+                            // Show confirmation dialog
+                            const useSubtitleMode = confirm(UI_STRINGS.subtitle?.detectPrompt || "這份 .txt 看起來有字幕時標，kàm beh 用字幕模式轉？");
+                            if (useSubtitleMode) {
+                                // User chose subtitle mode
+                                currentFileName = currentFileName.replace(/\.txt$/i, '.' + detectedFormat);
+                                updatePreviewLabel(detectedFormat);
+
+                                const parsedSubtitle = parseSubtitle(content, detectedFormat);
+                                currentSubtitleData = parsedSubtitle;
+                                currentSubtitleRawContent = content;
+                                currentSubtitleExt = detectedFormat;
+
+                                const hasMultiLine = parsedSubtitle.blocks.some(b => b.textLines.length > 1);
+
+                                document.getElementById('csv-options-expander').style.display = 'none';
+                                document.getElementById('json-options-expander').style.display = 'none';
+
+                                if (hasMultiLine) {
+                                    document.getElementById('subtitle-options-expander').style.display = 'block';
+                                    document.getElementById('subtitle-options-expander').open = true;
+                                    fileOutputSection.style.display = 'none';
+                                } else {
+                                    document.getElementById('subtitle-options-expander').style.display = 'none';
+                                    const converted = convertSubtitle(parsedSubtitle, 'all');
+                                    currentFileOutput = converted;
+                                    document.getElementById('csv-preview-table-container').style.display = 'none';
+                                    outputPreview.style.display = 'block';
+                                    outputPreview.value = converted.slice(0, 2000) + (converted.length > 2000 ? UI_STRINGS.messages.truncated : '');
+                                    fileOutputSection.style.display = 'block';
+                                }
+                                return; // Exit, async subtitle handling done
+                            }
+                            // User chose plain text mode - fall through
+                        }
+                    }
+
+                    // Process as plain text (md or txt without subtitle format)
+                    updatePreviewLabel(ext === 'md' ? 'md' : 'text');
+
+                    document.getElementById('csv-options-expander').style.display = 'none';
+                    document.getElementById('json-options-expander').style.display = 'none';
+                    document.getElementById('subtitle-options-expander').style.display = 'none';
+                    document.getElementById('csv-preview-table-container').style.display = 'none';
+                    outputPreview.style.display = 'block';
+
+                    const converted = TLtiau_2_POJtiau(content);
+                    currentFileOutput = converted;
+                    outputPreview.value = converted.slice(0, 2000) + (converted.length > 2000 ? UI_STRINGS.messages.truncated : '');
+                    fileOutputSection.style.display = 'block';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // CSV Convert Button
+        document.getElementById('btn-convert-csv').addEventListener('click', () => {
+            if (!currentCsvData) return;
+
+            const checkboxes = csvColumnsList.querySelectorAll('input[type="checkbox"]:checked');
+            const selectedCols = Array.from(checkboxes).map(cb => cb.value);
+
+            if (selectedCols.length === 0) {
+                alert(UI_STRINGS.messages.selectColumnsError);
+                return;
+            }
+
+            const mode = document.querySelector('input[name="csv-mode"]:checked').value;
+
+            // Convert selected columns
+            const convertedData = {};
+            selectedCols.forEach(col => {
+                const colValues = currentCsvData.rows.map(r => r[col] || '');
+                const combinedText = colValues.join('\n:::SEP:::\n');
+                const convertedCombined = TLtiau_2_POJtiau(combinedText);
+                convertedData[col] = convertedCombined.split('\n:::SEP:::\n');
+            });
+
+            // Build new headers and rows
+            const newHeaders = [];
+            const finalRows = currentCsvData.rows.map(() => ({}));
+
+            if (mode === 'insert') {
+                currentCsvData.headers.forEach(h => {
+                    newHeaders.push(h);
+                    currentCsvData.rows.forEach((row, i) => {
+                        finalRows[i][h] = row[h];
+                    });
+
+                    if (selectedCols.includes(h)) {
+                        const pojColName = h + '_POJ';
+                        newHeaders.push(pojColName);
+                        currentCsvData.rows.forEach((row, i) => {
+                            finalRows[i][pojColName] = convertedData[h][i] || '';
+                        });
+                    }
+                });
+            } else if (mode === 'original-plus') {
+                selectedCols.forEach(col => {
+                    newHeaders.push(col);
+                    currentCsvData.rows.forEach((row, i) => {
+                        finalRows[i][col] = row[col];
+                    });
+
+                    const pojColName = col + '_POJ';
+                    newHeaders.push(pojColName);
+                    currentCsvData.rows.forEach((row, i) => {
+                        finalRows[i][pojColName] = convertedData[col][i] || '';
+                    });
+                });
+            } else {
+                // 'only' mode
+                selectedCols.forEach(col => {
+                    const pojColName = col + '_POJ';
+                    newHeaders.push(pojColName);
+                    currentCsvData.rows.forEach((row, i) => {
+                        finalRows[i][pojColName] = convertedData[col][i] || '';
+                    });
+                });
+            }
+
+            const resultCSV = generateCSV(newHeaders, finalRows, currentCsvSeparator);
+            currentFileOutput = resultCSV;
+
+            const tableContainer = document.getElementById('csv-preview-table-container');
+            tableContainer.innerHTML = '';
+            tableContainer.appendChild(renderTable(newHeaders, finalRows));
+            tableContainer.style.display = 'block';
+            outputPreview.style.display = 'none';
+
+            document.getElementById('csv-options-expander').open = false;
+            fileOutputSection.style.display = 'block';
+        });
+
+        // JSON Convert Button
+        document.getElementById('btn-convert-json').addEventListener('click', () => {
+            if (!currentJsonData) return;
+
+            const jsonKeysList = document.getElementById('json-keys-list');
+            const checkboxes = jsonKeysList.querySelectorAll('input[type="checkbox"]:checked');
+            const selectedIndices = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+            if (selectedIndices.length === 0) {
+                alert(UI_STRINGS.messages.selectKeysError);
+                return;
+            }
+
+            const mode = document.querySelector('input[name="json-mode"]:checked').value;
+            const selectedKeys = selectedIndices.map(i => currentJsonPaths[i]);
+
+            let result;
+
+            if (currentJsonIsArray) {
+                const convertedData = {};
+
+                selectedKeys.forEach(keyInfo => {
+                    const values = currentJsonData.map(item => item[keyInfo.key] || '');
+                    const combined = values.join('\n:::JSON_SEP:::\n');
+                    const converted = TLtiau_2_POJtiau(combined);
+                    convertedData[keyInfo.key] = converted.split('\n:::JSON_SEP:::\n');
+                });
+
+                if (mode === 'only') {
+                    result = currentJsonData.map((item, i) => {
+                        const newItem = {};
+                        selectedKeys.forEach(keyInfo => {
+                            newItem[keyInfo.key + '_POJ'] = convertedData[keyInfo.key][i] || '';
+                        });
+                        return newItem;
+                    });
+                } else if (mode === 'original-plus') {
+                    result = currentJsonData.map((item, i) => {
+                        const newItem = {};
+                        selectedKeys.forEach(keyInfo => {
+                            newItem[keyInfo.key] = item[keyInfo.key];
+                            newItem[keyInfo.key + '_POJ'] = convertedData[keyInfo.key][i] || '';
+                        });
+                        return newItem;
+                    });
+                } else {
+                    const selectedKeyNames = new Set(selectedKeys.map(k => k.key));
+                    result = currentJsonData.map((item, i) => {
+                        const newItem = {};
+                        Object.keys(item).forEach(key => {
+                            newItem[key] = item[key];
+                            if (selectedKeyNames.has(key)) {
+                                newItem[key + '_POJ'] = convertedData[key][i] || '';
+                            }
+                        });
+                        return newItem;
+                    });
+                }
+            } else {
+                const combinedText = selectedKeys.map(k => k.sampleValue).join('\n:::JSON_SEP:::\n');
+                const convertedCombined = TLtiau_2_POJtiau(combinedText);
+                const convertedValues = convertedCombined.split('\n:::JSON_SEP:::\n');
+
+                if (mode === 'only') {
+                    result = {};
+                    selectedKeys.forEach((keyInfo, i) => {
+                        setNestedValue(result, keyInfo.key + '_POJ', convertedValues[i] || '');
+                    });
+                } else if (mode === 'original-plus') {
+                    result = {};
+                    selectedKeys.forEach((keyInfo, i) => {
+                        setNestedValue(result, keyInfo.key, keyInfo.sampleValue);
+                        setNestedValue(result, keyInfo.key + '_POJ', convertedValues[i] || '');
+                    });
+                } else {
+                    result = JSON.parse(JSON.stringify(currentJsonData));
+                    selectedKeys.forEach((keyInfo, i) => {
+                        setNestedValue(result, keyInfo.key + '_POJ', convertedValues[i] || '');
+                    });
+                }
+            }
+
+            const prettyJson = JSON.stringify(result, null, 2);
+            currentFileOutput = prettyJson;
+
+            document.getElementById('csv-preview-table-container').style.display = 'none';
+            outputPreview.style.display = 'block';
+            outputPreview.value = prettyJson.slice(0, 5000) + (prettyJson.length > 5000 ? '\n...(truncated)' : '');
+
+            document.getElementById('json-options-expander').open = false;
+            fileOutputSection.style.display = 'block';
+        });
+
+        // Subtitle Convert Button
+        document.getElementById('btn-convert-subtitle').addEventListener('click', () => {
+            if (!currentSubtitleData) return;
+
+            const modeRadio = document.querySelector('input[name="subtitle-mode"]:checked');
+            if (!modeRadio) {
+                alert(UI_STRINGS.messages.selectSubtitleLinesError);
+                return;
+            }
+
+            const mode = modeRadio.value;
+            const converted = convertSubtitle(currentSubtitleData, mode);
+            currentFileOutput = converted;
+
+            document.getElementById('csv-preview-table-container').style.display = 'none';
+            outputPreview.style.display = 'block';
+            outputPreview.value = converted.slice(0, 2000) + (converted.length > 2000 ? '\n...' : '');
+
+            document.getElementById('subtitle-options-expander').open = false;
+            fileOutputSection.style.display = 'block';
+        });
+
+        // Clipboard and Download Helpers
+        async function copyToClipboard(elementId, feedbackElementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+
+            // For textarea, we can select and copy, or use Clipboard API
+            // Clipboard API is cleaner
+            try {
+                // If it's the preview showing truncated text, we should copy the FULL text if possible
+                // But we store full text in variables for file mode.
+                // For RT, the textarea has the full text.
+                let textToCopy = el.value;
+                if (elementId === 'outputPreview' && currentFileOutput) {
+                    textToCopy = currentFileOutput; // Copy full file content
+                }
+
+                await navigator.clipboard.writeText(textToCopy);
+
+                // Visual feedback (optional)
+                if (feedbackElementId) {
+                    const btnSpan = document.getElementById(feedbackElementId);
+                    if (btnSpan) {
+                        const originalText = btnSpan.innerText;
+                        btnSpan.innerText = UI_STRINGS.buttons.copied;
+                        setTimeout(() => btnSpan.innerText = originalText, 2000);
+                    }
+                }
+
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                // Fallback: select and execCommand
+                el.select();
+                document.execCommand('copy');
+            }
+        }
+
+        async function pasteFromClipboard(elementId) {
+            try {
+                const text = await navigator.clipboard.readText();
+                const el = document.getElementById(elementId);
+                if (el) {
+                    el.value = text;
+                    // Trigger input event for real-time conversion
+                    el.dispatchEvent(new Event('input'));
+                }
+            } catch (err) {
+                console.error('Failed to read clipboard: ', err);
+                alert(UI_STRINGS.messages.clipboardError);
+            }
+        }
+
+        function downloadText(elementId, filename) {
+            let content = '';
+            if (elementId === 'outputPreview' && currentFileOutput) {
+                content = currentFileOutput;
+            } else {
+                content = document.getElementById(elementId).value;
+            }
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // --- Comprehensive Self-Test ---
+        function runTests() {
+            console.log("Running comprehensive self-test...");
+
+            const originalNasal = window.TL_USE_NASAL_SUPERSCRIPT;
+            const originalTone6 = window.TL_TONE6_USE_CARON;
+            const originalAllCaps = window.TL_ALL_CAPS_SUPPORT;
+
+            const runTestCase = (input, expected, config = {}) => {
+                // Apply config or defaults
+                window.TL_USE_NASAL_SUPERSCRIPT = config.nasal !== undefined ? config.nasal : true;
+                window.TL_TONE6_USE_CARON = config.tone6 !== undefined ? config.tone6 : false;
+                window.TL_ALL_CAPS_SUPPORT = config.allCaps !== undefined ? config.allCaps : true;
+
+                const result = TLtiau_2_POJtiau(input);
+                if (result !== expected) {
+                    console.error(`[FAIL] In: "${input}" | Expected: "${expected}" | Got: "${result}" | Config: ${JSON.stringify(config)}`);
+                    return false;
+                }
+                return true;
+            };
+
+            let passed = 0;
+            let total = 0;
+
+            const testCases = [
+                // 1. Basic Rules
+                { in: "phah", out: "phah" },
+                { in: "Tâi-uân", out: "Tâi-oân" },
+                { in: "tsuí", out: "chúi" },
+                { in: "tshuí", out: "chhúi" },
+                { in: "ing", out: "eng" },
+                { in: "tsa", out: "cha" },
+                { in: "a7", out: "ā" },
+                { in: "ah8", out: "a̍h" },
+                { in: "a9", out: "ă" },
+                // Tonemark position tests (ua->oa, ue->oe)
+                { in: "tuà", out: "tòa" }, // TL tuà (live) -> POJ tòa
+                { in: "kué", out: "kóe" }, // TL kué (rice pudding) -> POJ kóe  
+                { in: "suí", out: "súi" }, // TL suí (pretty) -> POJ súi (no change, tone on u)
+                { in: "uá", out: "óa" }, // TL uá (lean) -> POJ óa
+
+                // Tone 4 vs 8 Rules
+                { in: "a4", out: "a4" },   // TL a4 (no stop)
+                { in: "a8", out: "a8" },   // TL a8 (no stop)
+                { in: "ah4", out: "ah" },  // TL ah4 (stop)
+                { in: "ah8", out: "a̍h" },   // TL ah8 (stop)
+                { in: "ah3", out: "ah3" },  // TL ah3 (no stop)
+                { in: "ak7", out: "ak7" },   // TL ak7 (no stop)
+                { in: "SUT8", out: "SU̍T" },   // TL SUT8 (stop)
+
+                // Escape syntax tests
+                { in: "ts\\[ts]ts", out: "chtsch" },  // Edge case: \[ts] preserved, bare ts converted
+
+                // English False Positives (Escaped)
+                { in: "\\[cats]", out: "cats" },
+                { in: "Read a \\[book]", out: "Read a book" },
+                { in: "\\[Google]", out: "Google" },
+                { in: "\\[Blue] sky", out: "Blue sky" },
+                { in: "\\[Singing]", out: "Singing" },
+                { in: "\\[Wiki]", out: "Wiki" }
+            ];
+
+            tests.forEach(t => {
+                const res = TLtiau_2_POJtiau(t.in);
+                if (res !== t.out) {
+                    console.error(`Test failed: ${t.in} -> expected ${t.out}, got ${res}`);
+                } else {
+                    console.log(`Test passed: ${t.in} -> ${res}`);
+                }
+            });
+        }
+
+    </script>
+</body>
+
+</html>
