@@ -115,6 +115,8 @@ note:
             padding: 1.5rem;
             resize: none;
             outline: none;
+            padding-bottom: 80vh;
+            /* Allow scrolling past end for typewriter effect */
         }
 
         textarea:focus {
@@ -318,6 +320,14 @@ note:
                 </div>
             </div>
 
+            <div class="setting-item">
+                <span id="ui-lbl-scroll-lines" title="設定拍字時，頂懸欲留幾逝 context (建議 3-5 逝)"></span>
+                <div class="switch-container" style="justify-content: flex-end;">
+                    <input type="number" id="scroll-lines-input" min="1" max="15" value="5" class="input-number"
+                        style="width: 50px; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); text-align: center; background: var(--bg-secondary); color: var(--text-primary);">
+                </div>
+            </div>
+
             <div class="setting-item" style="border-bottom: none; margin-top: 0.5rem;">
                 <div style="display: flex; gap: 0.5rem; width: 100%;">
                     <button id="ui-btn-run-test" class="btn"
@@ -344,7 +354,10 @@ note:
             document.head.appendChild(link);
         })();
 
-        // --- UI Constants ---
+        // --- Configuration ---
+        let SCROLL_LOCK_LINES = 5; // Default n=5
+
+
         // --- UI Constants ---
         const UI_STRINGS = {
             title: "TL → POJ 現轉",
@@ -376,7 +389,8 @@ note:
                 title: "設定 (Settings)",
                 nasal: '尾N→鼻化音"ⁿ"',
                 tone6: "第6調 (ǎ)",
-                allcaps: "大寫模式 (ALL CAPS)"
+                allcaps: "大寫模式 (ALL CAPS)",
+                scrollLines: "自動捲留幾逝 (Auto-scroll Lines)"
             },
             placeholder: "隨輸入隨轉... (Type here...)\n( e.g. Oo1-oo1 → O͘-o͘\n        Tsai-iánn → Chai-iáⁿ,\n        han1-chi5 → han-chî )",
             footer: "<span>TL → POJ 現轉<br>© 2026 Cyber O͘-hîm Ki-tē. MIT License.</span>",
@@ -392,7 +406,7 @@ note:
                 <ul style="padding-left: 1.5rem; margin-top: 0.5rem;">
                     <li><strong>隨輸入隨轉</strong>: 拍字隨會轉做 POJ。</li>
                     <li><strong>原文/轉</strong>: 會使切欲看「原文」a̍h-sī「轉」結果。</li>
-                    <li><strong>設定</strong>: 調整 "ⁿ" (nn)、第6調 (ǎ/á) kap 大寫模式。</li>
+                    <li><strong>設定</strong>: 調整 "ⁿ" (nn)、第6調 (ǎ/á)、大寫模式 kap 自動捲留幾逝。</li>
                     <li><strong>Táng-ló͘</strong>: 轉好 ê 結果會使 táng-ló͘（download）做 .txt 檔。</li>
                 </ul>
                 <p style="margin-top: 1rem;"><strong>注意 (Note):</strong></p>
@@ -424,12 +438,16 @@ note:
             document.getElementById('ui-lbl-nasal-toggle').innerText = UI_STRINGS.settings.nasal;
             document.getElementById('ui-lbl-tone6-toggle').innerText = UI_STRINGS.settings.tone6;
             document.getElementById('ui-lbl-allcaps-toggle').innerText = UI_STRINGS.settings.allcaps;
+            document.getElementById('ui-lbl-scroll-lines').innerText = UI_STRINGS.settings.scrollLines;
 
             document.getElementById('ui-btn-run-test').innerText = UI_STRINGS.tooltips.runTest;
             document.getElementById('ui-btn-reset-settings').innerText = UI_STRINGS.tooltips.reset;
 
             document.getElementById('ui-lbl-help-title').innerText = UI_STRINGS.helpTitle;
             document.getElementById('help-content-area').innerHTML = UI_STRINGS.helpContent;
+
+            loadSettings();
+            updateSettings();
         }
         document.addEventListener('DOMContentLoaded', initUI);
 
@@ -971,7 +989,39 @@ note:
                     previousVal = val;
                 }
             }
+
+            adjustScrollPosition();
         });
+
+        // Auto-Scroll Logic
+        function adjustScrollPosition() {
+            // requestAnimationFrame to ensure we calculate after layout updates
+            requestAnimationFrame(() => {
+                const styles = window.getComputedStyle(inputArea);
+                let lineHeight = parseFloat(styles.lineHeight);
+                const paddingBottom = parseFloat(styles.paddingBottom);
+
+                // Fallback if lineHeight is "normal" or invalid
+                if (isNaN(lineHeight)) {
+                    const fontSize = parseFloat(styles.fontSize);
+                    lineHeight = fontSize * 1.6; // approx 1.6 from CSS line-height
+                }
+
+                if (isNaN(lineHeight) || lineHeight <= 0) return;
+
+                // Adjust scrollHeight to exclude the synthetic padding-bottom we added
+                // scrollHeight in DOM includes padding
+                const realContentHeight = inputArea.scrollHeight - paddingBottom;
+
+                // Goal: Top of viewport should be at `realTextEnd - (SCROLL_LOCK_LINES * lineHeight)`
+                const targetScrollTop = realContentHeight - (SCROLL_LOCK_LINES * lineHeight);
+
+                // Only scroll if we have enough content
+                if (targetScrollTop > 0) {
+                    inputArea.scrollTop = targetScrollTop;
+                }
+            });
+        }
 
         // Toolbar Buttons
         btnCopy.addEventListener('click', async () => {
@@ -993,6 +1043,12 @@ note:
             window.TL_TONE6_USE_CARON = tone6Toggle.checked;
             window.TL_ALL_CAPS_SUPPORT = allCapsToggle.checked;
 
+            // Update Scroll Lines
+            const linesVal = parseInt(document.getElementById('scroll-lines-input').value, 10);
+            if (!isNaN(linesVal) && linesVal > 0) {
+                SCROLL_LOCK_LINES = linesVal;
+            }
+
             // Re-convert current text with new settings
             const currentVal = inputArea.value;
             if (currentVal) {
@@ -1001,11 +1057,44 @@ note:
                     inputArea.value = newVal;
                 }
             }
+
+            saveSettings();
+        }
+
+        // --- Local Storage Logic ---
+        const STORAGE_KEY = 'TL_POJ_SIMPLE_SETTINGS';
+
+        function saveSettings() {
+            const settings = {
+                nasal: nasalToggle.checked,
+                tone6: tone6Toggle.checked,
+                allCaps: allCapsToggle.checked,
+                scrollLines: document.getElementById('scroll-lines-input').value
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const settings = JSON.parse(saved);
+                    if (typeof settings.nasal === 'boolean') nasalToggle.checked = settings.nasal;
+                    if (typeof settings.tone6 === 'boolean') tone6Toggle.checked = settings.tone6;
+                    if (typeof settings.allCaps === 'boolean') allCapsToggle.checked = settings.allCaps;
+                    if (settings.scrollLines) document.getElementById('scroll-lines-input').value = settings.scrollLines;
+                } catch (e) {
+                    console.error("Failed to load settings:", e);
+                }
+            }
         }
 
         nasalToggle.addEventListener('change', updateSettings);
         tone6Toggle.addEventListener('change', updateSettings);
         allCapsToggle.addEventListener('change', updateSettings);
+        document.getElementById('scroll-lines-input').addEventListener('change', updateSettings);
+
+        // Reset Logic
 
         // Test and Reset
         const TEST_SAMPLE = `=== TL 符號調輸入 (Diacritics) ===
