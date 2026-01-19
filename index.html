@@ -465,6 +465,8 @@
         </div>
         <hr class="cta-separator">
         <a href="#" class="btn btn-secondary btn-inline"></a>
+        <br style="margin-top: 0.5rem; display: block;">
+        <a href="#" class="btn btn-secondary btn-handset"></a>
     </section>
 
     <!-- Features Section -->
@@ -557,7 +559,9 @@
                 chromeStoreUrl: 'https://chrome.google.com/webstore/detail/placeholder',
                 githubUrl: 'https://github.com/CyberOoHim/tl_poj_extension',
                 zipUrl: 'packed/extension_20260120_0222.zip',
-                inlineUrl: 'https://cyberoohim.github.io/pages/tl_poj_converter.html'
+                inlineUrl: 'https://cyberoohim.github.io/pages/tl_poj_converter.html',
+                ctaHandset: 'Online Handset Version (線頂手機版隨用，無轉網頁)',
+                handsetUrl: 'https://cyberoohim.github.io/pages/tl_poj_converter_simple.html'
             },
 
             // Features Section
@@ -656,6 +660,13 @@
             if (inlineBtn) {
                 inlineBtn.textContent = C.hero.ctaInline;
                 inlineBtn.href = C.hero.inlineUrl;
+            }
+
+            // Handset Converter Button
+            const handsetBtn = document.querySelector('.btn-handset');
+            if (handsetBtn) {
+                handsetBtn.textContent = C.hero.ctaHandset;
+                handsetBtn.href = C.hero.handsetUrl;
             }
 
             // Features
