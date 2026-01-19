@@ -66,3 +66,5 @@ working/*
 !working/tl_poj_converter.html
 
 #.agent/
+
+*.code-workspace

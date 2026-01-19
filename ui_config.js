@@ -1,3 +1,7 @@
+// Guard against re-injection (content scripts can be injected multiple times)
+// Use globalThis for compatibility with both window (content scripts) and service workers (background.js)
+var _global = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this);
+
 if (typeof _global.TL_UI_CONFIG_LOADED === 'undefined') {
     _global.TL_UI_CONFIG_LOADED = true;
 
@@ -165,4 +169,230 @@ Tai5-uan5 si7 chit8-e5 ho2 so2-chai7.
 Goa2 ai3 lim te5, i ai3 chiah8 png7.`
     };
 
-} 
+} // End guard
+
+// Make UI_STRINGS accessible globally via var for backward compatibility
+var UI_STRINGS = _global.UI_STRINGS;
+
+function applyUIStrings() {
+    const UI_STRINGS = _global.UI_STRINGS; // Local reference
+    // Helper to set text content
+    function setText(id, text) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    }
+
+    // Helper to set placeholder
+    function setPlaceholder(id, text) {
+        const el = document.getElementById(id);
+        if (el) el.placeholder = text;
+    }
+
+    // Main Title
+    const h1 = document.querySelector('h1');
+    if (h1) h1.textContent = UI_STRINGS.title;
+
+    // Tabs
+    setText('tab-scan', UI_STRINGS.tabs.scan);
+    setText('tab-type', UI_STRINGS.tabs.type);
+    setText('tab-file', UI_STRINGS.tabs.file);
+
+    // Scan Mode
+    const scanLabel = document.querySelector('#panel-scan label');
+    if (scanLabel) scanLabel.textContent = UI_STRINGS.scan.label;
+    setPlaceholder('scan-output', UI_STRINGS.scan.placeholder);
+    setText('btn-copy-scan', UI_STRINGS.scan.btnCopy);
+    setText('btn-download-scan', UI_STRINGS.scan.btnDownload);
+
+    // Toggle Labels
+    const nasalToggleLabel = document.getElementById('lbl-nasal-toggle');
+    if (nasalToggleLabel) nasalToggleLabel.textContent = UI_STRINGS.settings.nasalLabel;
+
+    const autoConvertLabel = document.querySelector('label[for="auto-convert-toggle"].switch-text');
+    if (autoConvertLabel) autoConvertLabel.textContent = UI_STRINGS.autoConvert.toggle;
+
+    const scanEnableLabel = document.querySelector('label[for="scan-enable-conversion"].switch-text');
+    if (scanEnableLabel) scanEnableLabel.textContent = UI_STRINGS.scan.enableConversion;
+
+    const markdownDisplayLabel = document.querySelector('label[for="markdown-display-toggle"].switch-text');
+    if (markdownDisplayLabel) markdownDisplayLabel.textContent = UI_STRINGS.scan.markdownToggle;
+
+    // Type Mode
+    const inputLabel = document.querySelector('label[for="rt-input"]');
+    if (inputLabel) inputLabel.textContent = UI_STRINGS.type.inputLabel;
+
+    const outputLabel = document.querySelector('label[for="rt-output"]');
+    if (outputLabel) outputLabel.textContent = UI_STRINGS.type.outputLabel;
+
+    setPlaceholder('rt-input', UI_STRINGS.type.inputPlaceholder);
+    setPlaceholder('rt-output', UI_STRINGS.type.outputPlaceholder);
+
+    setText('btn-paste', UI_STRINGS.type.btnPaste);
+    setText('btn-clear-input', UI_STRINGS.type.btnClear);
+    setText('btn-copy', UI_STRINGS.type.btnCopy);
+    setText('btn-inject', UI_STRINGS.type.btnInject);
+    setText('btn-download-type', UI_STRINGS.type.btnDownload);
+
+    // File Mode
+    const dropText = document.querySelector('#dropZone p');
+    if (dropText) dropText.textContent = UI_STRINGS.file.dropZoneText;
+
+    setText('btn-choose-file', UI_STRINGS.file.btnChooseFile);
+
+    const fileLabel = document.querySelector('#panel-file .toolbar label');
+    if (fileLabel) fileLabel.textContent = UI_STRINGS.file.previewLabel;
+
+    setText('btn-copy-file', UI_STRINGS.file.btnCopy);
+    setText('btn-copy-file', UI_STRINGS.file.btnCopy);
+    setText('btn-download-file', UI_STRINGS.file.btnDownload);
+
+    // Help & Settings Mode
+    setText('header-settings', UI_STRINGS.settings.headerSettings);
+    setText('header-help', UI_STRINGS.settings.headerHelp);
+
+    // Toggles
+    setText('lbl-nasal-toggle', UI_STRINGS.settings.nasalLabel);
+    setText('lbl-tone6-toggle', UI_STRINGS.settings.tone6Label);
+    setText('lbl-allcaps-toggle', UI_STRINGS.settings.allCapsLabel);
+    setText('lbl-render-md-toggle', UI_STRINGS.settings.renderMdLabel);
+    setText('lbl-include-urls-toggle', UI_STRINGS.settings.includeUrlsLabel);
+
+    // Buttons
+    setText('btn-run-test', UI_STRINGS.settings.btnRunTest);
+    setText('btn-reset-settings', UI_STRINGS.settings.btnReset);
+
+    // Help Content is now loaded from docs/HELP.md via sidepanel.js
+
+    // General Warning Message
+    setText('msg-general-warning', UI_STRINGS.file.messages.general);
+
+    // CSV Mode
+    const uploadSummary = document.querySelector('#file-upload-expander summary');
+    if (uploadSummary) uploadSummary.textContent = UI_STRINGS.csv.uploadHeader;
+
+    const csvOptionsSummary = document.querySelector('#csv-options-expander summary');
+    if (csvOptionsSummary) csvOptionsSummary.textContent = UI_STRINGS.csv.optionsHeader;
+
+    // CSV Labels (Hard to select by just tag, so we might need IDs in HTML or specific selectors)
+    // Let's add IDs in the HTML step to make this robust. 
+    // For now, assuming IDs will be added:
+    setText('lbl-select-columns', UI_STRINGS.csv.selectColumns);
+    setText('lbl-output-mode', UI_STRINGS.csv.outputMode);
+
+    // For Radio Labels, we need to find the text node next to the input
+    function setRadioLabel(value, text) {
+        const radio = document.querySelector(`input[name="csv-mode"][value="${value}"]`);
+        if (radio && radio.parentElement) {
+            // radio.parentElement is the label. The text is the last child or we replace text content but keep input.
+            // Easier: preserve input, update text.
+            const nodes = radio.parentElement.childNodes;
+            // Usually input is first, text is second.
+            // Cleanest way: radio.parentElement.lastChild.textContent = text; 
+            // BUT carefully check HTML structure: <label><input> Text</label>
+            // So lastChild should be the text node.
+            if (nodes.length > 0) {
+                // iterate and find text node
+                for (let i = 0; i < nodes.length; i++) {
+                    if (nodes[i].nodeType === Node.TEXT_NODE && nodes[i].textContent.trim().length > 0) {
+                        nodes[i].textContent = " " + text;
+                        return;
+                    }
+                }
+                // If no text node found (shouldn't happen based on current logic), append one
+                radio.parentElement.appendChild(document.createTextNode(" " + text));
+            }
+        }
+    }
+    setRadioLabel('only', UI_STRINGS.csv.modeOnly);
+    setRadioLabel('original-plus', UI_STRINGS.csv.modeOriginalPlus);
+    setRadioLabel('insert', UI_STRINGS.csv.modeInsert);
+
+    setText('btn-convert-csv', UI_STRINGS.csv.btnConvert);
+    setText('btn-convert-csv', UI_STRINGS.csv.btnConvert);
+    setText('btn-reset-csv', UI_STRINGS.csv.btnCancel);
+
+    // JSON Mode
+    const jsonOptionsSummary = document.querySelector('#json-options-expander summary');
+    if (jsonOptionsSummary) jsonOptionsSummary.textContent = UI_STRINGS.json.optionsHeader;
+
+    setText('lbl-select-keys', UI_STRINGS.json.selectKeys);
+    setText('lbl-json-output-mode', UI_STRINGS.json.outputMode);
+
+    function setJsonRadioLabel(value, text) {
+        const radio = document.querySelector(`input[name="json-mode"][value="${value}"]`);
+        if (radio && radio.parentElement) {
+            const nodes = radio.parentElement.childNodes;
+            if (nodes.length > 0) {
+                for (let i = 0; i < nodes.length; i++) {
+                    if (nodes[i].nodeType === Node.TEXT_NODE && nodes[i].textContent.trim().length > 0) {
+                        nodes[i].textContent = " " + text;
+                        return;
+                    }
+                }
+                radio.parentElement.appendChild(document.createTextNode(" " + text));
+            }
+        }
+    }
+    setJsonRadioLabel('only', UI_STRINGS.json.modeOnly);
+    setJsonRadioLabel('original-plus', UI_STRINGS.json.modeOriginalPlus);
+    setJsonRadioLabel('insert', UI_STRINGS.json.modeInsert);
+
+    setText('btn-convert-json', UI_STRINGS.json.btnConvert);
+    setText('btn-reset-json', UI_STRINGS.json.btnCancel);
+
+    // Subtitle Mode
+    const subtitleOptionsSummary = document.querySelector('#subtitle-options-expander summary');
+    if (subtitleOptionsSummary) subtitleOptionsSummary.textContent = UI_STRINGS.subtitle.optionsHeader;
+
+    setText('lbl-select-lines', UI_STRINGS.subtitle.selectLines);
+
+    function setSubtitleRadioLabel(value, text) {
+        const radio = document.querySelector(`input[name="subtitle-mode"][value="${value}"]`);
+        if (radio && radio.parentElement) {
+            const nodes = radio.parentElement.childNodes;
+            if (nodes.length > 0) {
+                for (let i = 0; i < nodes.length; i++) {
+                    if (nodes[i].nodeType === Node.TEXT_NODE && nodes[i].textContent.trim().length > 0) {
+                        nodes[i].textContent = " " + text;
+                        return;
+                    }
+                }
+                radio.parentElement.appendChild(document.createTextNode(" " + text));
+            }
+        }
+    }
+    setSubtitleRadioLabel('all', UI_STRINGS.subtitle.modeAll);
+    setSubtitleRadioLabel('line1', UI_STRINGS.subtitle.modeLine1);
+    setSubtitleRadioLabel('line2', UI_STRINGS.subtitle.modeLine2);
+    setSubtitleRadioLabel('line3plus', UI_STRINGS.subtitle.modeLine3Plus);
+
+    setText('btn-convert-subtitle', UI_STRINGS.subtitle.btnConvert);
+    setText('btn-reset-subtitle', UI_STRINGS.subtitle.btnCancel);
+
+    // Select All / Deselect All buttons
+    setText('btn-csv-select-all', UI_STRINGS.selectionButtons.selectAll);
+    setText('btn-csv-deselect-all', UI_STRINGS.selectionButtons.deselectAll);
+    setText('btn-json-select-all', UI_STRINGS.selectionButtons.selectAll);
+    setText('btn-json-deselect-all', UI_STRINGS.selectionButtons.deselectAll);
+
+    // Tooltips
+    const btnResetFile = document.getElementById('btn-reset-file');
+    if (btnResetFile) btnResetFile.title = UI_STRINGS.tooltips.resetFile;
+
+    // Footer
+    const footer = document.querySelector('.footer');
+    if (footer) footer.innerHTML = UI_STRINGS.footer;
+}
+
+// Helper function to trigger button feedback animation
+function uiTriggerFeedback(button, duration = 600) {
+    if (!button) return;
+    button.classList.add('btn-feedback');
+    setTimeout(() => {
+        button.classList.remove('btn-feedback');
+    }, duration);
+}
+
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', applyUIStrings);
+}

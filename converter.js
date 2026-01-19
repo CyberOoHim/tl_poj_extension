@@ -113,7 +113,8 @@ if (typeof window.TL_Converter === 'undefined') {
       }
       // (Tailo2POJ mappings same as before)
       const tailo2poj = [
-        ['oonn', 'o͘N'], ['Oonn', 'O͘N'], ['onn', 'o͘N'], ['Onn', 'O͘N'],
+        ['oonn', 'o͘nn'], ['Oonn', 'O͘nn'],
+        /* ['onn', 'o͘N'], ['Onn', 'O͘N'], <-- REMOVED: onn should be oⁿ, not o͘N */
         ['ts', 'ch'], ['Ts', 'Ch'], ['oo', 'o͘'], ['Oo', 'O͘'],
         ['ua', 'oa'], ['Ua', 'Oa'], ['ue', 'oe'], ['Ue', 'Oe'],
         ['ing', 'eng'], ['Ing', 'Eng'], ['ik', 'ek'], ['Ik', 'Ek'],
@@ -123,7 +124,7 @@ if (typeof window.TL_Converter === 'undefined') {
       // Add all-caps variants if flag enabled
       if (window.TL_ALL_CAPS_SUPPORT) {
         tailo2poj.push(
-          ['OONN', 'O͘N'], ['ONN', 'O͘N'],
+          ['OONN', 'O͘NN'], ['ONN', 'O͘NN'],
           ['TS', 'CH'], ['OO', 'O͘'],
           ['UA', 'OA'], ['UE', 'OE'],
           ['ING', 'ENG'], ['IK', 'EK'],
@@ -147,16 +148,17 @@ if (typeof window.TL_Converter === 'undefined') {
       // - N at syllable tail (after vowel or vowel+h or m+h): Only convert when toggle is ON
       // - Standalone nn/N (not after valid pattern): Preserve as-is
       // Patterns: vowel+nn, vowel+h+nn, m+h+nn (and same for N)
-      const nn_to_superscript = /([aeiouAEIOUmM]h?|[aeiouAEIOU])nn(\d?)\b/g;
+      // Fix: Include combining dot \u0358 for o͘ handling
+      const nn_to_superscript = /([aeiouAEIOUmM]\u0358?h?|[aeiouAEIOUmM]\u0358?)nn(\d?)\b/g;
       poj_tiau = poj_tiau.replace(nn_to_superscript, '$1ⁿ$2');
 
       const useNasalSuperscript = typeof window !== 'undefined' &&
         window.TL_USE_NASAL_SUPERSCRIPT !== false;
       if (useNasalSuperscript) {
-        const N_to_superscript = /([aeiouAEIOUmM]h?|[aeiouAEIOU])N(\d?)\b/g;
+        const N_to_superscript = /([aeiouAEIOUmM]\u0358?h?|[aeiouAEIOUmM]\u0358?)N(\d?)\b/g;
         poj_tiau = poj_tiau.replace(N_to_superscript, '$1ⁿ$2');
         // Also handle Nh pattern (reorder and convert): aNh → ahⁿ
-        const Nh_to_superscript = /([aeiouAEIOUmM])Nh?(\d?)\b/g;
+        const Nh_to_superscript = /([aeiouAEIOUmM]\u0358?)Nh?(\d?)\b/g;
         poj_tiau = poj_tiau.replace(Nh_to_superscript, '$1hⁿ$2');
       }
 

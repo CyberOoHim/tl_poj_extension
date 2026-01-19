@@ -41,15 +41,23 @@ note:
             box-sizing: border-box;
         }
 
+        html {
+            height: 100%;
+            /* overflow: hidden;  <-- Relaxed this */
+        }
+
         body {
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            font-family: sans-serif;
-            height: 100vh;
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            height: 100%;
+            /* Keep full height */
+            /* overflow: hidden; <-- Relaxed this, let it flow if needed, but container is constrained */
             display: flex;
             flex-direction: column;
+            margin: 0;
             align-items: center;
-            padding: var(--spacing-md);
         }
 
         .container {
@@ -59,6 +67,8 @@ note:
             display: flex;
             flex-direction: column;
             gap: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            /* Restore padding here */
         }
 
         .header-row {
@@ -69,7 +79,7 @@ note:
         }
 
         h1 {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: var(--text-link);
             margin: 0;
             white-space: nowrap;
@@ -85,7 +95,7 @@ note:
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            padding: 8px 8px;
+            padding: 8px 12px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 1rem;
@@ -120,6 +130,8 @@ note:
             min-height: 0;
             /* Crucial for flex child scroll */
             overflow-y: auto;
+            padding-bottom: 50vh;
+            /* Allow scrolling past end for typewriter effect */
         }
 
         textarea:focus {
@@ -137,7 +149,9 @@ note:
             text-align: center;
             color: var(--text-secondary);
             font-size: 0.8rem;
-            margin-top: 0.5rem;
+            margin: 0;
+            flex-shrink: 0;
+            /* Never shrink the footer */
         }
 
         .footer span {
@@ -219,6 +233,11 @@ note:
             align-items: center;
             padding: 0.75rem 0;
             border-bottom: 1px solid var(--border-color);
+        }
+
+        .input-number {
+            font-size: 1.2rem;
+            font-weight: bold;
         }
 
         .main-panel {
@@ -324,9 +343,9 @@ note:
             </div>
 
             <div class="setting-item">
-                <span id="ui-lbl-scroll-lines" title="設定拍字時，頂懸欲留幾逝 context (建議 3-5 逝)"></span>
+                <span id="ui-lbl-scroll-lines" title="設定拍字時，頂懸欲留幾逝 context (建議 3-6 逝)"></span>
                 <div class="switch-container" style="justify-content: flex-end;">
-                    <input type="number" id="scroll-lines-input" min="1" max="15" value="5" class="input-number"
+                    <input type="number" id="scroll-lines-input" min="1" max="15" value="6" class="input-number"
                         style="width: 50px; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); text-align: center; background: var(--bg-secondary); color: var(--text-primary);">
                 </div>
             </div>
@@ -370,7 +389,7 @@ note:
         })();
 
         // --- Configuration ---
-        let SCROLL_LOCK_LINES = 5; // Default n=5
+        let SCROLL_LOCK_LINES = 6; // Default n=6
 
 
         // --- UI Constants ---
@@ -382,7 +401,7 @@ note:
             buttons: {
                 copy: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`,
                 clear: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`,
-                settings: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 40" width="28" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(4, 8)"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></g><line x1="30" y1="32" x2="34" y2="8" stroke-width="2.5" /><g transform="translate(36, 8)"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></g></svg>`,
+                settings: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" width="54" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(14, 8)"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></g><line x1="55" y1="32" x2="65" y2="8" stroke-width="2.5" /><g transform="translate(68, 8)"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></g></svg>`,
                 download: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`,
                 copied: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
                 back: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>`,
@@ -406,7 +425,7 @@ note:
                 nasal: '尾N→鼻化音"ⁿ"',
                 tone6: "第6調 (ǎ)",
                 allcaps: "大寫模式 (ALL CAPS)",
-                scrollLines: "自動捲留幾逝 (Auto-scroll Lines)"
+                scrollLines: "自動捲 beh 留幾逝 (Auto-scroll Lines)"
             },
             placeholder: "隨輸入隨轉... (Type here...)\n( e.g. Oo1-oo1 → O͘-o͘\n        Tsai-iánn → Chai-iáⁿ,\n        han1-chi5 → han-chî )",
             footer: "<span>TL → POJ 現轉<br>© 2026 Cyber O͘-hîm Ki-tē. MIT License.</span>",
