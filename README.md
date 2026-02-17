@@ -64,7 +64,7 @@
 
 ### Install from Chrome extension store / Ùi Chrome 線頂應用程式商店安裝
 
-**[Download from Chrome Web Store](https://chrome.google.com/webstore/detail/placeholder)** (Coming Soon)
+**[Download from Chrome Web Store](https://chromewebstore.google.com/detail/tl-%3E-poj-%E9%9A%A8%E6%99%82%E8%BD%89/fifgafegihlbgnalgnjinaokghnplkli?hl=en-US&utm_source=ext_sidebar)**
 
 ### Load Unpacked (Development) / 掠未封包 (開發用)
 
