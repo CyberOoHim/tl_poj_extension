@@ -317,7 +317,7 @@ if (typeof window.TL_Converter === 'undefined') {
       });
 
       // Preserve standalone URLs (http, https, ftp)
-      tl_tiau = tl_tiau.replace(/(https?|ftp):\/\/[^\s\)]+/g, (match) => {
+      tl_tiau = tl_tiau.replace(/(https?|ftp):\/\/[^\s\)\]\\]+/g, (match) => {
         urlPlaceholders.push(match);
         return `⟪URL${urlPlaceholders.length - 1}⟫`;
       });
@@ -409,11 +409,13 @@ if (typeof window.TL_Converter === 'undefined') {
 
     function updateState() {
       // Notify background script about state change
-      chrome.runtime.sendMessage({
-        type: "TL_EXTENSION_STATE_UPDATE",
-        pageConverted: _pageConverted,
-        hasHistory: historyStack.length > 0
-      }).catch(() => { }); // Catch error if popup/background not listening
+      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+        chrome.runtime.sendMessage({
+          type: "TL_EXTENSION_STATE_UPDATE",
+          pageConverted: _pageConverted,
+          hasHistory: historyStack.length > 0
+        }).catch(() => { }); // Catch error if popup/background not listening
+      }
     }
 
     function pushHistory(changes) {

@@ -14,45 +14,45 @@ e1 e2 e3 eh4 e5 e6 e7 eh8 e9
 o1 o2 o3 oh4 o5 o6 o7 oh8 o9
 
 === TL→POJ 音素轉換 (Phonemes) ===
-\\[ts\\]: tsuí (水), tsit (這)
-\\[tsh\\]: tshut (出), tshài (菜)
-\\[oo\\]: oo (烏), hōo (予)
+\[ts\]: tsuí (水), tsit (這)
+\[tsh\]: tshut (出), tshài (菜)
+\[oo\]: oo (烏), hōo (予)
 j: jī (字), jia̍t (熱) (無變)
 
-\\[=== 鼻音 (nn / N) ===
+\[=== 鼻音 (nn / N) ===
 [尾N→ⁿ Toggle(切)]
 nn尾 (一定 lóng 轉): sann→saⁿ (三), sinn→siⁿ (生)
 N尾 ON: saN→saⁿ, siN→siⁿ, a̍hN→a̍hⁿ
-N尾 OFF: saN→saN, siN→siN, a̍hN→a̍hN\\]
+N尾 OFF: saN→saN, siN→siN, a̍hN→a̍hN\]
 (頭前 ê nn / N 袂變: nng → nng, NG → NG)
 
-\\[=== 第六調 (Tone 6) ===
+\[=== 第六調 (Tone 6) ===
 [第6調 ǎ Toggle(切)]
 ON (Caron): a6→ǎ, e6→ě, o6→ǒ, ng6→ňg
-OFF (Acute): a6→á, e6→é, o6→ó, ng6→ńg\\]
+OFF (Acute): a6→á, e6→é, o6→ó, ng6→ńg\]
 
-\\[=== 大寫 (ALL CAPS) ===
+\[=== 大寫 (ALL CAPS) ===
 [大寫模式 Toggle(切)]
 ON: TSUI→CHUI, TSHUT→CHHUT, OO→O͘
-OFF: TSUI→TSUI, TSHUT→TSHUT, OO→OO (無轉)\\]
+OFF: TSUI→TSUI, TSHUT→TSHUT, OO→OO (無轉)\]
 
-\\[=== 調位標記 (Vowel Priority) ===
+\[=== 調位標記 (Vowel Priority) ===
 ua→oa: tuà→tòa (大), kuà→kòa (掛)
 ue→oe: kué→kóe (粿), pué→póe (飛)
-ui: suí→súi (水), kuí→kúi (鬼)\\]
+ui: suí→súi (水), kuí→kúi (鬼)\]
 
 === 走脫語法 (Escape Syntax) ===
-基本: \\[Tâi-uân\\] → Tâi-uân (原文保留)
-濟逝: \\[Thâu tsuā
-Jī tsuā\\] ← Hāⁿ 逝 mā lóng 袂轉
+基本: \[Tâi-uân\] → Tâi-uân (原文保留)
+濟逝: \[Thâu tsuā
+Jī tsuā\] ← Hāⁿ 逝 mā lóng 袂轉
 
 相套 (Nested):
-\\[khí-thâu \\[ tē-jī\\] ← thâu-ê \\] 就收煞
-\\[(結果: "khí-thâu \\[ tē-jī" + 落尾照常轉)\\]
+\[khí-thâu \[ tē-jī\] ← thâu-ê \] 就收煞
+\[(結果: "khí-thâu \[ tē-jī" + 落尾照常轉)\]
 
-英文: \\[Google\\] vs Google, \\[Boots\\] vs Boots
-     \\["I read a book about blue cats."\\] vs "I read a book about blue cats."
-URL: \\["https://example.com/page?id=tsing_tsha"\\] vs "https://example.com/page?id=tsing_tsha"
+英文: \[Google\] vs Google, \[Boots\] vs Boots
+     \["I read a book about blue cats."\] vs "I read a book about blue cats."
+URL: \["https://example.com/page?id=tsing_tsha"\] vs "https://example.com/page?id=tsing_tsha"
 
 === 邊墘狀況 (Other Cases) ===
 混合: 123 !@# $100 (tsu-pún) {tsuí}
@@ -60,7 +60,7 @@ URL: \\["https://example.com/page?id=tsing_tsha"\\] vs "https://example.com/page
 引句點: "tsuí" 'tsuí' 「tsuí」『tsuí』
 Han-jī 相濫: 台灣 Tâi-uân 是 sī 好 hó 所在 só͘-chāi
 頭尾空白:"   tsuí   "(空白無變)
-Ài 有連字符: \\[Tâiuânlâng, tsabóogíná\\] → Tâiuânlâng, tsabóogíná (無連字符無保證著)
+Ài 有連字符: \[Tâiuânlâng, tsabóogíná\] → Tâiuânlâng, tsabóogíná (無連字符無保證著)
 數字調號相濫: Goa2 ài 啉 tê5, 伊 ai3 食 png7.
 
 oonn onn Oonn Onn
