@@ -10,8 +10,11 @@ Goa2 ai3 lim te5, i ai3 chiah8 png7.
 === 調號 1-9 (Tones) ===
 a1 a2 a3 ah4 a5 a6 a7 ah8 a9
 A1 A2 A3 AH4 A5 A6 A7 AH8 A9
+I1 I2 I3 IH4 I5 I6 I7 IH8 I9
 e1 e2 e3 eh4 e5 e6 e7 eh8 e9
 o1 o2 o3 oh4 o5 o6 o7 oh8 o9
+oo1 oo2 oo3 ooh4 oo5 oo6 oo7 ooh8 oo9
+m1 m2 m3 mh4 m5 m6 m7 mh8 m9
 
 === TL→POJ 音素轉換 (Phonemes) ===
 \[ts\]: tsuí (水), tsit (這)
@@ -42,7 +45,7 @@ ue→oe: kué→kóe (粿), pué→póe (飛)
 ui: suí→súi (水), kuí→kúi (鬼)\]
 
 === 走脫語法 (Escape Syntax) ===
-基本: \[Tâi-uân\] → Tâi-uân (原文保留)
+基本: \[Tâi-uân\]  (原文保留) → Tâi-uân
 濟逝: \[Thâu tsuā
 Jī tsuā\] ← Hāⁿ 逝 mā lóng 袂轉
 
