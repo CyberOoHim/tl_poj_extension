@@ -49,20 +49,29 @@ note: 1. enhance POJ text Preservation
             padding: 0;
         }
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             background-color: var(--bg-primary);
             color: var(--text-primary);
             font-family: var(--font-sans);
             line-height: 1.6;
             padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
             max-width: 1200px;
+            width: 100%;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
             gap: var(--spacing-xs);
+            flex: 1;
+            min-height: 0;
         }
 
         header {
@@ -112,18 +121,44 @@ note: 1. enhance POJ text Preservation
             display: block;
         }
 
+        #panel-realtime.active {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
         /* Real-time Mode Styles */
         .split-view {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: var(--spacing-md);
-            height: 600px;
+            grid-template-rows: auto 1fr;
+            gap: 0 var(--spacing-md);
+            flex: 1;
+            min-height: 0;
         }
+
+        .text-area-container {
+            display: contents;
+        }
+
+        .text-area-container:nth-child(1) .toolbar { grid-column: 1; grid-row: 1; }
+        .text-area-container:nth-child(1) textarea { grid-column: 1; grid-row: 2; }
+        .text-area-container:nth-child(2) .toolbar { grid-column: 2; grid-row: 1; }
+        .text-area-container:nth-child(2) textarea { grid-column: 2; grid-row: 2; }
 
         @media (max-width: 768px) {
             .split-view {
-                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
+                gap: var(--spacing-md);
                 height: auto;
+            }
+            .text-area-container {
+                display: flex;
+                flex-direction: column;
+                height: 40vh;
+                min-height: 250px;
             }
         }
 
@@ -165,13 +200,6 @@ note: 1. enhance POJ text Preservation
                 /* Slightly smaller text for mobile readability */
                 padding: 0.75rem;
             }
-        }
-
-        .text-area-container {
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            height: 100%;
         }
 
         .toolbar {
@@ -560,8 +588,6 @@ note: 1. enhance POJ text Preservation
                         </div>
                     </div>
                     <textarea id="rt-input" placeholder="" spellcheck="false"></textarea>
-                    <button class="tool-btn" id="ui-btn-quick-test" onclick="injectTestText()"
-                        style="margin-top: var(--spacing-xs); align-self: center;"></button>
                 </div>
                 <div class="text-area-container">
                     <div class="toolbar">
@@ -1124,7 +1150,6 @@ POJ O͘點「o͘」: hó͘→hó͘, gô͘→gô͘, o͘→o͘ (袂變做 Tailo oo
             document.getElementById('ui-btn-copy-file').innerText = UI_STRINGS.buttons.copy;
             document.getElementById('ui-btn-download-file').innerText = UI_STRINGS.buttons.download;
             document.getElementById('ui-btn-choose-file').innerText = UI_STRINGS.buttons.chooseFile;
-            document.getElementById('ui-btn-quick-test').innerText = UI_STRINGS.buttons.quickTest;
             document.getElementById('ui-btn-download-offline-text').innerText = UI_STRINGS.buttons.downloadOffline;
             document.getElementById('ui-btn-clear').innerText = UI_STRINGS.buttons.clear;
             document.getElementById('ui-footer').innerText = UI_STRINGS.footer;
