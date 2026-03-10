@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "TL -> POJ 隨時轉",
-  "version": "1.2",
-  "description": "Instant Tâi-lô Pheng-im (TL) to Taiwanese Pe̍h-ōe-jī (POJ) converter / 隨時 kā 網頁、拍字、文件 ê 台羅拼音 (TL) 轉做台語白話字 (POJ)。100% 在地走，保證隱私。",
+  "name": "TL 拼音 -> POJ 隨時轉",
+  "version": "1.3",
+  "description": "Instant Tâi-lô Pheng-im (TL 拼音) to Taiwanese Pe̍h-ōe-jī (POJ) converter / 隨時 kā 網頁、拍字、文件 ê 台羅拼音 (TL 拼音) 轉做台語白話字 (POJ)。100% 在地走，保證隱私。",
   "permissions": [
     "activeTab",
     "scripting",
@@ -25,7 +25,7 @@
     "128": "icons/icon128.png"
   },
   "action": {
-    "default_title": "TL -> POJ 隨時轉"
+    "default_title": "TL 拼音 -> POJ 隨時轉"
   },
   "side_panel": {
     "default_path": "sidepanel.html"

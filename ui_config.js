@@ -6,7 +6,7 @@ if (typeof _global.TL_UI_CONFIG_LOADED === 'undefined') {
     _global.TL_UI_CONFIG_LOADED = true;
 
     _global.UI_STRINGS = {
-        title: "TL -> POJ 隨時轉",
+        title: "TL 拼音 -> POJ 隨時轉",
         tabs: {
             scan: "轉網頁",
             type: "拍字轉",
@@ -24,8 +24,8 @@ if (typeof _global.TL_UI_CONFIG_LOADED === 'undefined') {
             markdownToggle: "看 MD"
         },
         type: {
-            inputLabel: "TL / TL & POJ 帶數字調號",
-            inputPlaceholder: "拍/貼 TL he̍k-chiá TL/POJ 標數字調號...",
+            inputLabel: "TL 拼音 / TL 拼音 & POJ 帶數字調號",
+            inputPlaceholder: "拍/貼 TL 拼音 he̍k-chiá TL 拼音/POJ 標數字調號...",
             outputLabel: "POJ 輸出",
             outputPlaceholder: "POJ 輸出...",
             btnPaste: "貼",
@@ -140,7 +140,7 @@ if (typeof _global.TL_UI_CONFIG_LOADED === 'undefined') {
             nasalLabel: '尾N→鼻化音"ⁿ"',
             tone6Label: "第6調 (ǎ)",
             allCapsLabel: "大寫模式 (ALL CAPS)",
-            btnRunTest: "看 TL->POJ ê 見本 a̍h-sī 測看覓",
+            btnRunTest: "看 TL 拼音->POJ ê 見本 a̍h-sī 測看覓",
             btnReset: "恢復初設 (Reset Default)",
             btnHelpLang: "說明語言: 台語 (Help Lang)",
             showRawMdLabel: "顯示原始 Markdown 格式",
@@ -159,12 +159,12 @@ if (typeof _global.TL_UI_CONFIG_LOADED === 'undefined') {
             embedLabel: "Embedded content"
         },
         footer: "© 2026 <a href=\"https://cyberoohim.github.io/\" target=\"_blank\" style=\"color: inherit; text-decoration: none;\">Cyber O͘-hîm ki-tē</a>",
-        testSample: `=== TL 符號調輸入 (Diacritics) ===
+        testSample: `=== TL 拼音 符號調輸入 (Diacritics) ===
 Tâi-uân sī chi̍t-ê hó só͘-chāi. (台灣是一个好所在)
 Tsit-chân tāi-tsì tsin-tsiànn hó. (這層代誌真正好)
 POJ 帶符號調號無 koh 轉: Góa ài lim tê, i ài chia̍h pn̄g. (我愛啉茶，伊愛食飯)
 
-=== TL/POJ 數字調輸入 (Numeric) ===
+=== TL 拼音/POJ 數字調輸入 (Numeric) ===
 Tai5-uan5 si7 chit8-e5 ho2 so2-chai7.
 Goa2 ai3 lim te5, i ai3 chiah8 png7.`
     };

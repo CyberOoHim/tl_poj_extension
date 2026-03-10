@@ -1,15 +1,15 @@
 # Help & Settings / 說明 & 設定
 
-* **Note**: You can type TL with numeric tones or symbolic tones, or POJ with numeric tones; all will be converted to POJ with symbolic tones.
+* **Note**: You can type TL Pinyin with numeric tones or symbolic tones, or POJ with numeric tones; all will be converted to POJ with symbolic tones.
 * **Note**: If other foreign languages happen to match TL patterns, they might be mistranslated. This is a limitation. Use escape syntax to avoid this; click **the first button on the top** to see examples. However, this cannot be avoided when directly scanning web pages.
 
 ## 1. 轉網頁 (Scan Mode)
 
-Directly reads and converts KIP (TL) from web pages into POJ.
+Directly reads and converts TL Pinyin from web pages into POJ.
 
 * **揀欲愛--ê 來轉 (Select text to convert)**: Select text on the webpage, and it will automatically convert to POJ and display in the extension.
-* **就地轉 POJ 開關 (Live Convert Switch)**: Turn ON to convert all TL text on the entire webpage directly into POJ in-place.
-* **轉 POJ 開關 (Web Conversion Switch)**: Turn ON so that "Scan Page" converts found TL to POJ; if OFF, it displays the original TL text.
+* **就地轉 POJ 開關 (Live Convert Switch)**: Turn ON to convert all TL Pinyin on the entire webpage directly into POJ in-place.
+* **轉 POJ 開關 (Web Conversion Switch)**: Turn ON so that "Scan Page" converts found TL Pinyin to POJ; if OFF, it displays the original TL Pinyin.
 * **看 MD 開關 (View MD Switch)**: Turn ON "View MD" to display the result in Markdown format, which can include images, videos, etc. (See Markdown URL setting). The downloaded format is the same as what you see.
 * **URL Preservation**: All URLs (links) remain unconverted in POJ.
 * **Note**: Webpage structures vary greatly. We cannot guarantee the format of captured full articles is always correct; please check the content manually.
@@ -21,12 +21,12 @@ Directly reads and converts KIP (TL) from web pages into POJ.
   * **Note**: Complex webpages may not be captured completely, or formatting may not be perfect.
   * **Note**: For guaranteed content and formatting, selecting specific text to convert is more reliable.
 * **就地轉 POJ (Live Convert)**: Convert text on the webpage to POJ in-place (Synced with the Live Convert switch).
-* **復原 (Undo)**: Revert back to the original TL text.
+* **復原 (Undo)**: Revert back to the original TL Pinyin.
 * **文字總清 (Clear Text)**: Clear all input and output boxes in "Scan Mode" and "Type Mode". Does not affect "File Mode".
 
 ## 2. 拍字轉 (Type Mode)
 
-Simple TL to POJ converter tool, supports both diacritic TL and numeric tone POJ.
+Simple TL Pinyin to POJ converter tool, supports both diacritic TL Pinyin and numeric tone POJ.
 
 * **輸入 (Input)**: Type text in the top box (e.g., Tye5-uan5 / Tâi-uân).
 * **輸出 (Output)**: The bottom box will instantly display the converted POJ.
@@ -64,14 +64,14 @@ Three Toggles:
 * **A+/A-**: Adjust Text Size.
 * **☀️/🌙 (Day/Night Mode)**: Toggle Light/Dark background.
 
-* **看 TL->POJ ê 見本 a̍h-sī 測看覓 (View Samples / Test)**: Click this button to automatically load comprehensive test samples into the "Type" tab. Use this to reference various usage examples and see how settings apply.
+* **看 TL 拼音->POJ ê 見本 a̍h-sī 測看覓 (View Samples / Test)**: Click this button to automatically load comprehensive test samples into the "Type" tab. Use this to reference various usage examples and see how settings apply.
 * **恢復初設 (Reset Default)**: Restore all settings to their original defaults.
 
 ---
 
 ## About Us (About)
 
-* TL -> POJ Sûi-sî-choán Converter  
+* TL Pinyin -> POJ Sûi-sî-choán Converter  
 * Copyright © 2026 [Cyber O͘-hîm ki-tē](https://cyberoohim.github.io/)  
 * Licensed under MIT License
 

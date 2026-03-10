@@ -1,9 +1,9 @@
-=== TL 符號調輸入 (Diacritics) ===
+=== TL 拼音 符號調輸入 (Diacritics) ===
 Tâi-uân sī chi̍t-ê hó só͘-chāi. (台灣是一个好所在)
 Tsit-chân tāi-tsì tsin-tsiànn hó. (這層代誌真正好)
 POJ 帶符號調號無 koh 轉: Góa ài lim tê, i ài chia̍h pn̄g. (我愛啉茶，伊愛食飯)
 
-=== TL/POJ 數字調輸入 (Numeric) ===
+=== TL 拼音/POJ 數字調輸入 (Numeric) ===
 Tai5-uan5 si7 chit8-e5 ho2 so2-chai7.
 Goa2 ai3 lim te5, i ai3 chiah8 png7.
 
@@ -16,7 +16,7 @@ o1 o2 o3 oh4 o5 o6 o7 oh8 o9
 oo1 oo2 oo3 ooh4 oo5 oo6 oo7 ooh8 oo9
 m1 m2 m3 mh4 m5 m6 m7 mh8 m9
 
-=== TL→POJ 音素轉換 (Phonemes) ===
+=== TL 拼音→POJ 音素轉換 (Phonemes) ===
 \[ts\]: tsuí (水), tsit (這)
 \[tsh\]: tshut (出), tshài (菜)
 \[oo\]: oo (烏), hōo (予)
@@ -64,13 +64,11 @@ URL: \["https://example.com/page?id=tsing_tsha"\] vs "https://example.com/page?i
 Han-jī 相濫: 台灣 Tâi-uân 是 sī 好 hó 所在 só͘-chāi
 頭尾空白:"   tsuí   "(空白無變)
 Ài 有連字符: \[Tâiuânlâng, tsabóogíná\] → Tâiuânlâng, tsabóogíná (無連字符無保證著)
-數字調號相濫: Goa2 ài 啉 tê5, 伊 ai3 食 png7.
-
-oonn onn Oonn Onn
+數字調號相濫: Goa2 ài 啉 tê, 伊 ai3 食 png7.
 
 === POJ 保留 (POJ Preservation) ===
 POJ 鼻化「ⁿ」: chiâⁿ→chiâⁿ, siaⁿ→siaⁿ, koaⁿ→koaⁿ (袂變做 Tailo nn)
 POJ O͘點「o͘」: hó͘→hó͘, gô͘→gô͘, o͘→o͘ (袂變做 Tailo oo)
-混合輸入: chiâⁿ tsuí → chiâⁿ chúi (POJ 保留, TL 照常轉)
-混合輸入: hó͘ oo → hó͘ o͘ (POJ o͘ 保留, TL oo 轉做 POJ)
+混合輸入: chiâⁿ tsuí → chiâⁿ chúi (POJ 保留, TL 拼音 照常轉)
+混合輸入: hó͘ oo → hó͘ o͘ (POJ o͘ 保留, TL 拼音 oo 轉做 POJ)
 大寫 POJ: Chiâⁿ→Chiâⁿ, Ô͘→Ô͘ (大寫 POJ mā 袂變)

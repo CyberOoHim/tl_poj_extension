@@ -1,15 +1,15 @@
 # Help & Settings / 說明 & 設定
 
-* **注意**: Lán 會用得拍 台羅數字調號 kap 符號調號 TL a̍h-sī POJ 數字調號 lóng-chóng 會轉做 POJ 符號調號。
+* **注意**: Lán 會用得拍 台羅數字調號 kap 符號調號 TL 拼音 a̍h-sī POJ 數字調號 lóng-chóng 會轉做 POJ 符號調號。
 * **注意**: 假使有其他外語拄á好部份 chham 台羅 相siâng，會誤轉。這是 lán ê 使用限制。用走脫語法 thang 避免，chhi̍h **頂懸頭1粒** chhi̍h-liú 看例。M̄-koh 若現轉網頁 tō 無法度。
 
 ## 1. 轉網頁 (Scan Mode)
 
-會tàng直接讀網頁頂懸轉好 POJ ê TL。
+會tàng直接讀網頁頂懸轉好 POJ ê TL 拼音。
 
 * **揀欲愛--ê 來轉**: 網頁頂懸揀文字，就會自動轉做 POJ 顯示 tī extension。
-* **就地轉 POJ 開關**: Kā 開--開，會用得 kā 規網頁 ê TL 直接轉做 POJ。
-* **轉 POJ 開關**: Kā 開--開，轉網頁 才會 kā TL 轉 POJ 顯示；若關--起来，就顯示原本的 TL。
+* **就地轉 POJ 開關**: Kā 開--開，會用得 kā 規網頁 ê TL 拼音 直接轉做 POJ。
+* **轉 POJ 開關**: Kā 開--開，轉網頁 才會 kā TL 拼音 轉 POJ 顯示；若關--起来，就顯示原本的 TL 拼音。
 * **看 MD 開關**: "看 MD" 開--開，會 kā 結果用 Markdown 格式顯示，會使包括圖、影片等等 ê 網鍊（看 Markdown 帶 網鍊（URL）設定）。Táng-ló͘--ê 格式 chham 看著--ê 仝款。
 * **網址保留**: 所有的 URL (網鍊) lóng袂轉 POJ。
 * **注意**: 網頁結構厚變化，無法度保證掠--著 ê 規篇文章格式正確，內容 mā ài檢查。
@@ -21,12 +21,12 @@
   * **注意**: 網頁狀況複雜，無保證齊掠有，mā 無定著格式 lóng 正確。
   * **注意**: 若欲保證內容 kap 格式無重耽，揀文字來轉會加較好勢。
 * **就地轉 POJ**: 網頁原位直接轉 POJ (Kap 轉網頁 ê 就地轉 仝步)。
-* **復原**: 復原tńg去原底 ê TL。
+* **復原**: 復原tńg去原底 ê TL 拼音。
 * **文字總清 (Clear Text)**: Kā "轉網頁" he̍k-chiá "拍字轉" 所有 ê 輸入／輸出框 lóng-chóng 清 kah 空。Tī 別位無影響。
 
 ## 2. 拍字轉 (Type Mode)
 
-簡單 ê TL 轉 POJ ke-si，支援符號調號 TL 和數字調號 POJ。
+簡單 ê TL 拼音 轉 POJ ke-si，支援符號調號 TL 拼音和數字調號 POJ。
 
 * **輸入**: Tiàm 頂懸框á拍字 (例: Tye5-uan5 / Tâi-uân)。
 * **輸出**: 下跤框á會隨顯示轉好 ê POJ。
@@ -64,14 +64,14 @@
 * **A+/A-**: Chhiâu 字骨大細 (Text Size)。
 * **☀️/🌙(日--時/暗暝 模式)**: 切 光/暗 背景。
 
-* **看 TL->POJ ê 見本 a̍h-sī 測看覓**: Chhi̍h 這粒chhi̍h鈕，會自動掠測試例文去「拍字轉」分頁，內底有各種 TL 轉 POJ ê 例，會使參考各種用法，koh 設定是 án-chóaⁿ 用。
+* **看 TL 拼音->POJ ê 見本 a̍h-sī 測看覓**: Chhi̍h 這粒chhi̍h鈕，會自動掠測試例文去「拍字轉」分頁，內底有各種 TL 拼音 轉 POJ ê 例，會使參考各種用法，koh 設定是 án-chóaⁿ 用。
 * **恢復初設 (Reset Default)**: Kā 設定 lóng-chóng 恢復做原底 ê 預設。
 
 ---
 
 ## 阮 (About)
 
-* TL -> POJ 隨時轉 Converter  
+* TL 拼音 -> POJ 隨時轉 Converter  
 * Copyright © 2026 [Cyber O͘-hîm ki-tē](https://cyberoohim.github.io/)  
 * Licensed under MIT License
 
